@@ -1,11 +1,12 @@
-package com.liverussia.security;
+package com.liverussia.service.impl;
 
 import com.liverussia.dao.entity.User;
-import com.liverussia.domain.JwtAuthentication;
+import com.liverussia.domain.JwtUser;
 import com.liverussia.dto.request.JwtRequest;
 import com.liverussia.dto.response.JwtResponse;
 import com.liverussia.error.ApiException;
 import com.liverussia.error.ErrorContainer;
+import com.liverussia.security.JwtProvider;
 import com.liverussia.service.UserService;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -28,11 +30,15 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
+    //
+    private final BCryptPasswordEncoder passwordEncoder;
+
 
     public JwtResponse login(JwtRequest request) {
-        //TODO Вынести в userService выброс ошибки
-        User user = userService.getByLogin(request.getLogin())
-                .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
+
+        User user = userService.getByLogin(request.getLogin());
+
+        String encodePassword = passwordEncoder.encode(request.getPassword());
 
         authenticateUser(request);
 
@@ -65,8 +71,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User user = userService.getByLogin(login)
-                        .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
+                final User user = userService.getByLogin(login);
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 return new JwtResponse(accessToken, null);
             }
@@ -80,8 +85,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User user = userService.getByLogin(login)
-                        .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
+                final User user = userService.getByLogin(login);
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 refreshStorage.put(user.getLogin(), newRefreshToken);
@@ -91,8 +95,8 @@ public class AuthService {
         throw new ApiException(ErrorContainer.TOKEN_EXPIRED);
     }
 
-    public JwtAuthentication getAuthInfo() {
-        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    public JwtUser getAuthInfo() {
+        return (JwtUser) SecurityContextHolder.getContext().getAuthentication();
     }
 
 }

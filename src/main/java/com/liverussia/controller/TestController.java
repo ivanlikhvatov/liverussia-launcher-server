@@ -1,9 +1,7 @@
 package com.liverussia.controller;
 
-import com.liverussia.dao.TestEntity;
-import com.liverussia.domain.JwtAuthentication;
-import com.liverussia.repository.TestRepository;
-import com.liverussia.security.AuthService;
+import com.liverussia.domain.JwtUser;
+import com.liverussia.service.impl.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,15 +28,13 @@ public class TestController {
 //    }
 
     @GetMapping("/android/hello")
-    public ResponseEntity<String> helloUser(@AuthenticationPrincipal JwtAuthentication user) {
-        final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok("Hello android user " + authInfo.getPrincipal() + "!");
+    public ResponseEntity<String> helloUser(@AuthenticationPrincipal JwtUser user) {
+        return ResponseEntity.ok("Hello android user " + user.getLogin() + "!");
     }
 
     @GetMapping("/admin/hello")
-    public ResponseEntity<String> helloAdmin() {
-        final JwtAuthentication authInfo = authService.getAuthInfo();
-        return ResponseEntity.ok("Hello admin " + authInfo.getPrincipal() + "!");
+    public ResponseEntity<String> helloAdmin(@AuthenticationPrincipal JwtUser user) {
+        return ResponseEntity.ok("Hello admin " + user.getLogin() + "!");
     }
 
 

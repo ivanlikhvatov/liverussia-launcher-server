@@ -1,12 +1,9 @@
 package com.liverussia.security;
 
-import com.liverussia.domain.JwtAuthentication;
-import com.liverussia.security.utils.JwtUtils;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -36,8 +33,7 @@ public class JwtFilter extends GenericFilterBean {
         String token = getTokenFromRequest((HttpServletRequest) request);
 
         if (token != null && jwtProvider.validateAccessToken(token)) {
-            Claims claims = jwtProvider.getAccessClaims(token);
-            JwtAuthentication jwtInfoToken = JwtUtils.generate(claims);
+            Authentication jwtInfoToken = jwtProvider.getAuthentication(token);
 //            jwtInfoToken.setAuthenticated(true);
             SecurityContextHolder.getContext().setAuthentication(jwtInfoToken);
         }

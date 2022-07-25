@@ -2,6 +2,8 @@ package com.liverussia.service.impl;
 
 import com.liverussia.dao.entity.Role;
 import com.liverussia.dao.entity.User;
+import com.liverussia.error.ApiException;
+import com.liverussia.error.ErrorContainer;
 import com.liverussia.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +25,14 @@ public class UserServiceImpl implements UserService {
         admin.setLogin("admin");
         admin.setRoles(Set.of(Role.ADMIN));
         admin.setFirstName("Ivan");
-        admin.setPassword("1234");
+        admin.setPassword("$2a$10$K5q7my0TKpc.bWYRKuZnEuCshELgxZ3cOJ16xIoXEbTDW.wt4BZfe");
 
         User androidUser = new User();
         androidUser.setFirstName("Gena");
         androidUser.setId("2");
         androidUser.setLogin("android-user");
         androidUser.setRoles(Set.of(Role.ANDROID_USER));
-        androidUser.setPassword("1234");
+        androidUser.setPassword("$2a$10$K5q7my0TKpc.bWYRKuZnEuCshELgxZ3cOJ16xIoXEbTDW.wt4BZfe");
 
         this.users = List.of(
                 admin,
@@ -39,9 +41,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getByLogin(@NonNull String login) {
+    public User getByLogin(@NonNull String login) {
         return users.stream()
                 .filter(user -> login.equals(user.getLogin()))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
     }
 }

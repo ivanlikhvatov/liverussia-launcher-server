@@ -1,7 +1,7 @@
 package com.liverussia.controller;
 
 import com.liverussia.domain.JwtUser;
-import com.liverussia.service.impl.AuthService;
+import com.liverussia.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

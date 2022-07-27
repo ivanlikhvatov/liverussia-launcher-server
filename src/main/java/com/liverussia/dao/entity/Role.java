@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import com.liverussia.error.ApiException;
-import com.liverussia.error.ErrorContainer;
+import com.liverussia.error.apiException.ApiException;
+import com.liverussia.error.apiException.ErrorContainer;
 
 import java.util.Arrays;
 

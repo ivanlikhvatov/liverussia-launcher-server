@@ -3,7 +3,7 @@ package com.liverussia.controller;
 import com.liverussia.dto.request.JwtRequest;
 import com.liverussia.dto.request.RefreshJwtRequest;
 import com.liverussia.dto.response.JwtResponse;
-import com.liverussia.service.impl.AuthService;
+import com.liverussia.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

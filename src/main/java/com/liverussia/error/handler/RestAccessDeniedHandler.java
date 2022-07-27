@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
-import com.liverussia.error.ApiError;
-import com.liverussia.error.ApiException;
-import com.liverussia.error.ErrorContainer;
+import com.liverussia.error.apiException.ApiError;
+import com.liverussia.error.apiException.ApiException;
+import com.liverussia.error.apiException.ErrorContainer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

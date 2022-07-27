@@ -1,4 +1,4 @@
-package com.liverussia.error;
+package com.liverussia.error.apiException;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,7 @@
 package com.liverussia.security;
 
 import com.liverussia.dao.entity.User;
-import com.liverussia.domain.JwtUser;
-import com.liverussia.error.ApiException;
-import com.liverussia.error.ErrorContainer;
+import com.liverussia.domain.TokenAndExpiration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -12,12 +10,14 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -35,53 +35,89 @@ public class JwtProvider {
     private final static String CREDENTIALS = "";
     private final static String ROLES_LIST_NAME = "roles";
 
+    private final UserDetailsService jwtUserDetailsService;
     private final SecretKey jwtAccessSecret;
     private final SecretKey jwtRefreshSecret;
-
-    //TODO проверить с абстракцией
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final int accessTokenExpirationMinutes;
+    private final int refreshTokenExpirationDays;
 
     public JwtProvider(
             @Value("${jwt.secret.access.token}") String jwtAccessSecret,
             @Value("${jwt.secret.refresh.token}") String jwtRefreshSecret,
+            @Value("${jwt.secret.access.duration.minutes}") int accessTokenExpirationMinutes,
+            @Value("${jwt.secret.refresh.duration.days}") int refreshTokenExpirationDays,
             JwtUserDetailsService jwtUserDetailsService
     ) {
         this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
         this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
+        this.accessTokenExpirationMinutes = accessTokenExpirationMinutes;
+        this.refreshTokenExpirationDays = refreshTokenExpirationDays;
         this.jwtUserDetailsService = jwtUserDetailsService;
     }
 
-    public String generateAccessToken(User user) {
-        final LocalDateTime now = LocalDateTime.now();
-        final Instant accessExpirationInstant = now.plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant();
-        final Date accessExpiration = Date.from(accessExpirationInstant);
+    //TODO переименовать и разделить на два метода
+    public TokenAndExpiration generateAccessToken(User user) {
+        LocalDateTime now = LocalDateTime.now();
+        Instant accessExpirationInstant = now.plusMinutes(accessTokenExpirationMinutes)
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
 
-        return Jwts.builder()
+        //TODO возварщать дату в нормальном формате
+        Date accessExpiration = Date.from(accessExpirationInstant);
+
+        String token = Jwts.builder()
                 .setSubject(user.getLogin())
                 .setExpiration(accessExpiration)
                 .signWith(jwtAccessSecret)
                 .claim(ROLES_LIST_NAME, user.getRoles())
                 .compact();
+
+        TokenAndExpiration tokenAndExpiration = new TokenAndExpiration();
+        tokenAndExpiration.setToken(token);
+        tokenAndExpiration.setExpiration(accessExpiration.toString());
+
+        return tokenAndExpiration;
     }
 
-    public String generateRefreshToken(User user) {
-        final LocalDateTime now = LocalDateTime.now();
-        final Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
-        final Date refreshExpiration = Date.from(refreshExpirationInstant);
-        return Jwts.builder()
+    //TODO переименовать и разделить на два метода
+    public TokenAndExpiration generateRefreshToken(User user) {
+        LocalDateTime now = LocalDateTime.now();
+        Instant refreshExpirationInstant = now.plusDays(refreshTokenExpirationDays)
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+
+        //TODO возварщать дату в нормальном формате
+        Date refreshExpiration = Date.from(refreshExpirationInstant);
+
+        String token = Jwts.builder()
                 .setSubject(user.getLogin())
                 .setExpiration(refreshExpiration)
                 .signWith(jwtRefreshSecret)
                 .compact();
+
+        TokenAndExpiration tokenAndExpiration = new TokenAndExpiration();
+        tokenAndExpiration.setToken(token);
+        tokenAndExpiration.setExpiration(refreshExpiration.toString());
+
+        return tokenAndExpiration;
     }
 
     public boolean validateAccessToken(String accessToken) {
-        return validateToken(accessToken, jwtAccessSecret);
+        try {
+            return validateToken(accessToken, jwtAccessSecret);
+        } catch (AuthenticationException e){
+            return false;
+        }
     }
 
     public boolean validateRefreshToken(String refreshToken) {
-        return validateToken(refreshToken, jwtRefreshSecret);
+        try {
+            return validateToken(refreshToken, jwtRefreshSecret);
+        } catch (AuthenticationException e){
+            return false;
+        }
     }
+
 
     private boolean validateToken(String token, Key secret) {
         try {
@@ -90,19 +126,39 @@ public class JwtProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException expEx) {
-            throw new ApiException(ErrorContainer.TOKEN_EXPIRED);
-        } catch (UnsupportedJwtException unsEx) {
-            log.error("Unsupported jwt", unsEx);
-        } catch (MalformedJwtException mjEx) {
-            log.error("Malformed jwt", mjEx);
-        } catch (SignatureException sEx) {
-            log.error("Invalid signature", sEx);
+//        } catch (ExpiredJwtException e) {
+//            throw new UsernameNotFoundException(e.getMessage());
+//        } catch (UnsupportedJwtException e) {
+//            throw new UsernameNotFoundException(e.getMessage());
+//        } catch (MalformedJwtException e) {
+//            throw new UsernameNotFoundException(e.getMessage());
+//        } catch (SignatureException e) {
+//            throw new UsernameNotFoundException(e.getMessage());
         } catch (Exception e) {
-            log.error("invalid token", e);
+            throw new UsernameNotFoundException(e.getMessage());
         }
-        return false;
     }
+
+//    private boolean validateToken(String token, Key secret) {
+//        try {
+//            Jwts.parserBuilder()
+//                    .setSigningKey(secret)
+//                    .build()
+//                    .parseClaimsJws(token);
+//            return true;
+//        } catch (ExpiredJwtException e) {
+//            throw new UsernameNotFoundException(e.getMessage());
+//        } catch (UnsupportedJwtException unsEx) {
+//            log.error("Unsupported jwt", unsEx);
+//        } catch (MalformedJwtException mjEx) {
+//            log.error("Malformed jwt", mjEx);
+//        } catch (SignatureException sEx) {
+//            log.error("Invalid signature", sEx);
+//        } catch (Exception e) {
+//            log.error("invalid token", e);
+//        }
+//        return false;
+//    }
 
     public Claims getAccessClaims(String token) {
         return getClaims(token, jwtAccessSecret);

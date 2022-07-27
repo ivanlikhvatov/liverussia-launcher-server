@@ -1,8 +1,8 @@
 package com.liverussia.security;
 
 import com.liverussia.dao.entity.User;
-import com.liverussia.error.ApiException;
-import com.liverussia.error.ErrorContainer;
+import com.liverussia.error.apiException.ApiException;
+import com.liverussia.error.apiException.ErrorContainer;
 import com.liverussia.mapper.JwtUserMapper;
 import com.liverussia.service.UserService;
 import lombok.RequiredArgsConstructor;

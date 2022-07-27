@@ -1,9 +1,9 @@
 package com.liverussia.error.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.liverussia.error.ApiError;
-import com.liverussia.error.ApiException;
-import com.liverussia.error.ErrorContainer;
+import com.liverussia.error.apiException.ApiError;
+import com.liverussia.error.apiException.ApiException;
+import com.liverussia.error.apiException.ErrorContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

@@ -40,7 +40,7 @@ jwt:
     refresh:
       token: zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==
       duration:
-        minutes: 300
+        days: 30
 
 
 upload:

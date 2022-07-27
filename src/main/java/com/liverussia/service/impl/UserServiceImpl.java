@@ -2,15 +2,14 @@ package com.liverussia.service.impl;
 
 import com.liverussia.dao.entity.Role;
 import com.liverussia.dao.entity.User;
-import com.liverussia.error.ApiException;
-import com.liverussia.error.ErrorContainer;
+import com.liverussia.error.apiException.ApiException;
+import com.liverussia.error.apiException.ErrorContainer;
 import com.liverussia.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -19,6 +18,8 @@ public class UserServiceImpl implements UserService {
     private final List<User> users;
 
     public UserServiceImpl() {
+
+        //pass 1234
 
         User admin = new User();
         admin.setId("1");

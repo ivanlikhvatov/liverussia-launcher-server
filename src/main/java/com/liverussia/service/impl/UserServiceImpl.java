@@ -33,7 +33,8 @@ public class UserServiceImpl implements UserService {
         androidUser.setId("2");
         androidUser.setLogin("android-user");
         androidUser.setRoles(Set.of(Role.ANDROID_USER));
-        androidUser.setPassword("$2a$10$K5q7my0TKpc.bWYRKuZnEuCshELgxZ3cOJ16xIoXEbTDW.wt4BZfe");
+        androidUser.setPassword("9F4830BABDFC5C9185F423457FA489F9BFF4799F719775B2F8552BB4498925BA");
+        androidUser.setSalt("urq+~zcS]|Z:#kVv");
 
         this.users = List.of(
                 admin,

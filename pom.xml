@@ -37,7 +37,7 @@
         <relativePath/>
     </parent>
 
-    <dependencies>
+    <dependencies><!-- Thanks for using https://jar-download.com -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

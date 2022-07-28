@@ -55,51 +55,35 @@ public class JwtProvider {
         this.jwtUserDetailsService = jwtUserDetailsService;
     }
 
-    //TODO переименовать и разделить на два метода
-    public TokenAndExpiration generateAccessToken(User user) {
+    public String generateAccessToken(User user) {
         LocalDateTime now = LocalDateTime.now();
         Instant accessExpirationInstant = now.plusMinutes(accessTokenExpirationMinutes)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
 
-        //TODO возварщать дату в нормальном формате
         Date accessExpiration = Date.from(accessExpirationInstant);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(user.getLogin())
                 .setExpiration(accessExpiration)
                 .signWith(jwtAccessSecret)
                 .claim(ROLES_LIST_NAME, user.getRoles())
                 .compact();
-
-        TokenAndExpiration tokenAndExpiration = new TokenAndExpiration();
-        tokenAndExpiration.setToken(token);
-        tokenAndExpiration.setExpiration(accessExpiration.toString());
-
-        return tokenAndExpiration;
     }
 
-    //TODO переименовать и разделить на два метода
-    public TokenAndExpiration generateRefreshToken(User user) {
+    public String generateRefreshToken(User user) {
         LocalDateTime now = LocalDateTime.now();
         Instant refreshExpirationInstant = now.plusDays(refreshTokenExpirationDays)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
 
-        //TODO возварщать дату в нормальном формате
         Date refreshExpiration = Date.from(refreshExpirationInstant);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(user.getLogin())
                 .setExpiration(refreshExpiration)
                 .signWith(jwtRefreshSecret)
                 .compact();
-
-        TokenAndExpiration tokenAndExpiration = new TokenAndExpiration();
-        tokenAndExpiration.setToken(token);
-        tokenAndExpiration.setExpiration(refreshExpiration.toString());
-
-        return tokenAndExpiration;
     }
 
     public boolean validateAccessToken(String accessToken) {

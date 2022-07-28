@@ -34,19 +34,12 @@ public class AuthServiceImpl implements AuthService {
 
         authenticateUser(request);
 
-        TokenAndExpiration accessToken = jwtProvider.generateAccessToken(user);
-        TokenAndExpiration refreshToken = jwtProvider.generateRefreshToken(user);
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
 
-        refreshStorage.put(user.getLogin(), refreshToken.getToken());
+        refreshStorage.put(user.getLogin(), refreshToken);
 
-        //TODO маппер
-        JwtResponse jwtResponse = new JwtResponse();
-        jwtResponse.setAccessToken(accessToken.getToken());
-        jwtResponse.setAccessExpiration(accessToken.getExpiration());
-        jwtResponse.setRefreshToken(refreshToken.getToken());
-        jwtResponse.setRefreshExpiration(refreshToken.getExpiration());
-
-        return jwtResponse;
+        return new JwtResponse(accessToken, refreshToken);
     }
 
     @Override
@@ -58,19 +51,13 @@ public class AuthServiceImpl implements AuthService {
 
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 User user = userService.getByLogin(login);
-                TokenAndExpiration accessToken = jwtProvider.generateAccessToken(user);
+                String accessToken = jwtProvider.generateAccessToken(user);
 
-
-                //TODO маппер
-                JwtResponse jwtResponse = new JwtResponse();
-                jwtResponse.setAccessToken(accessToken.getToken());
-                jwtResponse.setAccessExpiration(accessToken.getExpiration());
-
-                return jwtResponse;
+                return new JwtResponse(accessToken, null);
             }
         }
 
-        return new JwtResponse();
+        return new JwtResponse(null, null);
     }
 
     @Override
@@ -82,21 +69,11 @@ public class AuthServiceImpl implements AuthService {
 
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 User user = userService.getByLogin(login);
+                String accessToken = jwtProvider.generateAccessToken(user);
+                String newRefreshToken = jwtProvider.generateRefreshToken(user);
+                refreshStorage.put(user.getLogin(), newRefreshToken);
 
-
-                TokenAndExpiration accessToken = jwtProvider.generateAccessToken(user);
-                TokenAndExpiration newRefreshToken = jwtProvider.generateRefreshToken(user);
-
-                refreshStorage.put(user.getLogin(), newRefreshToken.getToken());
-
-                //TODO маппер
-                JwtResponse jwtResponse = new JwtResponse();
-                jwtResponse.setAccessToken(accessToken.getToken());
-                jwtResponse.setAccessExpiration(accessToken.getExpiration());
-                jwtResponse.setRefreshToken(newRefreshToken.getToken());
-                jwtResponse.setRefreshExpiration(newRefreshToken.getExpiration());
-
-                return jwtResponse;
+                return new JwtResponse(accessToken, newRefreshToken);
             }
         }
 

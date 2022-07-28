@@ -10,8 +10,5 @@ import lombok.NoArgsConstructor;
 public class JwtResponse {
     private final String type = "Bearer";
     private String accessToken;
-    private String accessExpiration;
     private String refreshToken;
-    private String refreshExpiration;
-
 }

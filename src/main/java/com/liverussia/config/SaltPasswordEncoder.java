@@ -34,17 +34,24 @@ public class SaltPasswordEncoder implements PasswordEncoder {
  */
         if(salt != null) {
 
-            String encode = DigestUtils.sha256Hex(salt + rawPassword);
+//            String encode = DigestUtils.sha256Hex(salt + rawPassword);
+//
+//            byte[] bytesDbEncodePassword = encodedPassword.getBytes(StandardCharsets.UTF_8);
+//
+////    case of password authentication
+//
+//            byte[] bytesInputEncodePassword = getHashWithSalt(rawPassword.toString().toUpperCase(), salt.getBytes(StandardCharsets.UTF_8));
+//
+//            boolean tmp = DigestUtils.sha256Hex(rawPassword + salt).equalsIgnoreCase(encodedPassword);
+//
+//            return true;
 
-            byte[] bytesDbEncodePassword = encodedPassword.getBytes(StandardCharsets.UTF_8);
+            String encode = DigestUtils.sha256Hex(rawPassword + salt);
 
-//    case of password authentication
+            boolean tmp = DigestUtils.sha256Hex(rawPassword + salt).equalsIgnoreCase(encodedPassword);
 
-            byte[] bytesInputEncodePassword = getHashWithSalt(rawPassword.toString().toUpperCase(), salt.getBytes(StandardCharsets.UTF_8));
+            return tmp;
 
-            boolean tmp = DigestUtils.sha256Hex(salt + rawPassword).equalsIgnoreCase(encodedPassword);
-
-            return true;
         } else {
             //case of client-secret authentication
             return rawPassword.equals(encodedPassword);

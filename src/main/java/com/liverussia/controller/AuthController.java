@@ -26,11 +26,11 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-    @PostMapping("/token")
-    public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody @Valid RefreshJwtRequest request) {
-        final JwtResponse token = authService.getAccessToken(request.getRefreshToken());
-        return ResponseEntity.ok(token);
-    }
+//    @PostMapping("/token")
+//    public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody @Valid RefreshJwtRequest request) {
+//        final JwtResponse token = authService.getAccessToken(request.getRefreshToken());
+//        return ResponseEntity.ok(token);
+//    }
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody @Valid RefreshJwtRequest request) {

@@ -1,2 +1,3 @@
-1) на крайняк сделать exception extends AuthExc и проверять их 
-    через instnceOf
+
+**Реализлвать**
+1) хранение refreshToken в редис

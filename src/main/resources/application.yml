@@ -1,11 +1,11 @@
 server:
   port: 9400
 
-#spring:
-#  datasource:
-#    url: jdbc:mariadb://188.120.229.168:3306/LifeRussia
-#    username: launcherIvan
-#    password: 1597538624
+spring:
+  datasource:
+    url: jdbc:mariadb://188.120.229.168:3306/LifeRussia
+    username: launcherIvan
+    password: 1597538624
 #  jpa:
 #    generate-ddl: true
 

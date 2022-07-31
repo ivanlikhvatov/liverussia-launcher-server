@@ -1,15 +1,10 @@
 package com.liverussia.security;
 
-import com.liverussia.dao.entity.User;
-import com.liverussia.domain.TokenAndExpiration;
+import com.liverussia.domain.JwtUser;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,7 +50,7 @@ public class JwtProvider {
         this.jwtUserDetailsService = jwtUserDetailsService;
     }
 
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(JwtUser user) {
         LocalDateTime now = LocalDateTime.now();
         Instant accessExpirationInstant = now.plusMinutes(accessTokenExpirationMinutes)
                 .atZone(ZoneId.systemDefault())
@@ -71,7 +66,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(JwtUser user) {
         LocalDateTime now = LocalDateTime.now();
         Instant refreshExpirationInstant = now.plusDays(refreshTokenExpirationDays)
                 .atZone(ZoneId.systemDefault())
@@ -110,39 +105,10 @@ public class JwtProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-//        } catch (ExpiredJwtException e) {
-//            throw new UsernameNotFoundException(e.getMessage());
-//        } catch (UnsupportedJwtException e) {
-//            throw new UsernameNotFoundException(e.getMessage());
-//        } catch (MalformedJwtException e) {
-//            throw new UsernameNotFoundException(e.getMessage());
-//        } catch (SignatureException e) {
-//            throw new UsernameNotFoundException(e.getMessage());
         } catch (Exception e) {
             throw new UsernameNotFoundException(e.getMessage());
         }
     }
-
-//    private boolean validateToken(String token, Key secret) {
-//        try {
-//            Jwts.parserBuilder()
-//                    .setSigningKey(secret)
-//                    .build()
-//                    .parseClaimsJws(token);
-//            return true;
-//        } catch (ExpiredJwtException e) {
-//            throw new UsernameNotFoundException(e.getMessage());
-//        } catch (UnsupportedJwtException unsEx) {
-//            log.error("Unsupported jwt", unsEx);
-//        } catch (MalformedJwtException mjEx) {
-//            log.error("Malformed jwt", mjEx);
-//        } catch (SignatureException sEx) {
-//            log.error("Invalid signature", sEx);
-//        } catch (Exception e) {
-//            log.error("invalid token", e);
-//        }
-//        return false;
-//    }
 
     public Claims getAccessClaims(String token) {
         return getClaims(token, jwtAccessSecret);

@@ -1,9 +1,8 @@
 package com.liverussia.config;
 
-import com.liverussia.dao.entity.Role;
+import com.liverussia.domain.Role;
 import com.liverussia.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,7 +58,7 @@ public class SecurityConfig {
                                 .antMatchers(permitAll)
                                 .permitAll()
                                 .antMatchers(roleAdmin)
-                                .hasAuthority(Role.ADMIN.name())
+                                .hasAuthority(Role.ADMIN_LEVEL_10.name())
                                 .antMatchers(roleStudent)
                                 .hasAuthority(Role.ANDROID_USER.name())
                                 .anyRequest()

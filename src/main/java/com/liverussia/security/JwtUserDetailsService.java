@@ -22,16 +22,16 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
     private final JwtUserMapper jwtUserMapper;
+    private final SaltPasswordEncoder saltPasswordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User user = userService.getByLogin(login);
+        User user = userService.getUserByLogin(login);
 
         Optional.ofNullable(user)
                 .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
 
-        //TODO
-        SaltPasswordEncoder.SALT = user.getSalt();
+        saltPasswordEncoder.setSalt(user.getSalt());
 
         return jwtUserMapper.map(user);
     }

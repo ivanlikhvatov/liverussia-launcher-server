@@ -7,8 +7,19 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JwtResponse {
-    private final String type = "Bearer";
+public class AuthenticationResponseDto {
+
+//    private final String type = "Bearer";
+
     private String accessToken;
+
     private String refreshToken;
+
+    private String balance;
+
+    private String username;
+
+    private String serverName;
+
+
 }

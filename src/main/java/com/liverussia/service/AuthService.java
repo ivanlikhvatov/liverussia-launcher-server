@@ -1,12 +1,12 @@
 package com.liverussia.service;
 
-import com.liverussia.dto.request.JwtRequest;
-import com.liverussia.dto.response.JwtResponse;
+import com.liverussia.dto.request.AuthenticationRequestDto;
+import com.liverussia.dto.response.AuthenticationResponseDto;
 
 public interface AuthService {
-    JwtResponse login(JwtRequest request);
+    AuthenticationResponseDto login(AuthenticationRequestDto request);
 
-    JwtResponse getAccessToken(String refreshToken);
+    AuthenticationResponseDto getAccessToken(String refreshToken);
 
-    JwtResponse refresh(String refreshToken);
+    AuthenticationResponseDto refresh(String refreshToken);
 }

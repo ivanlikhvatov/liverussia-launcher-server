@@ -1,8 +1,8 @@
 package com.liverussia.service.impl;
 
 import com.liverussia.domain.JwtUser;
-import com.liverussia.dto.request.JwtRequest;
-import com.liverussia.dto.response.JwtResponse;
+import com.liverussia.dto.request.AuthenticationRequestDto;
+import com.liverussia.dto.response.AuthenticationResponseDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
 import com.liverussia.security.JwtProvider;
@@ -26,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public JwtResponse login(JwtRequest request) {
+    public AuthenticationResponseDto login(AuthenticationRequestDto request) {
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
 
         authenticateUser(request);
@@ -36,11 +36,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenService.putNewToken(jwtUser.getLogin(), refreshToken);
 
-        return new JwtResponse(accessToken, refreshToken);
+        return new AuthenticationResponseDto(accessToken, refreshToken);
     }
 
     @Override
-    public JwtResponse getAccessToken(String refreshToken) {
+    public AuthenticationResponseDto getAccessToken(String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String login = claims.getSubject();
@@ -50,15 +50,15 @@ public class AuthServiceImpl implements AuthService {
                 JwtUser user = userService.getJwtUserByLogin(login);
                 String accessToken = jwtProvider.generateAccessToken(user);
 
-                return new JwtResponse(accessToken, null);
+                return new AuthenticationResponseDto(accessToken, null);
             }
         }
 
-        return new JwtResponse(null, null);
+        return new AuthenticationResponseDto(null, null);
     }
 
     @Override
-    public JwtResponse refresh(String refreshToken) {
+    public AuthenticationResponseDto refresh(String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String login = claims.getSubject();
@@ -71,14 +71,14 @@ public class AuthServiceImpl implements AuthService {
                 String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 refreshTokenService.putNewToken(user.getLogin(), newRefreshToken);
 
-                return new JwtResponse(accessToken, newRefreshToken);
+                return new AuthenticationResponseDto(accessToken, newRefreshToken);
             }
         }
 
         throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
     }
 
-    private void authenticateUser(JwtRequest request) {
+    private void authenticateUser(AuthenticationRequestDto request) {
         String login = request.getLogin();
         String password = request.getPassword();
 

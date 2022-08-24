@@ -1,11 +1,10 @@
 package com.liverussia.controller;
 
-import com.liverussia.dto.request.JwtRequest;
-import com.liverussia.dto.request.RefreshJwtRequest;
-import com.liverussia.dto.response.JwtResponse;
+import com.liverussia.dto.request.AuthenticationRequestDto;
+import com.liverussia.dto.request.RefreshJwtRequestDto;
+import com.liverussia.dto.response.AuthenticationResponseDto;
 import com.liverussia.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +20,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody @Valid JwtRequest authRequest) {
-        final JwtResponse token = authService.login(authRequest);
-        return ResponseEntity.ok(token);
+    public AuthenticationResponseDto login(@RequestBody @Valid AuthenticationRequestDto request) {
+        return authService.login(request);
+    }
+
+    @PostMapping("/refresh")
+    public AuthenticationResponseDto getNewRefreshToken(@RequestBody @Valid RefreshJwtRequestDto request) {
+        return authService.refresh(request.getRefreshToken());
     }
 
 //    @PostMapping("/token")
@@ -31,11 +34,5 @@ public class AuthController {
 //        final JwtResponse token = authService.getAccessToken(request.getRefreshToken());
 //        return ResponseEntity.ok(token);
 //    }
-
-    @PostMapping("/refresh")
-    public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody @Valid RefreshJwtRequest request) {
-        final JwtResponse token = authService.refresh(request.getRefreshToken());
-        return ResponseEntity.ok(token);
-    }
 
 }

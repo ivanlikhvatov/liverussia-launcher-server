@@ -14,6 +14,8 @@ public class JwtUser implements UserDetails {
 
     private String login;
     private String password;
+    private String balance;
+    private String serverName;
     private Set<Role> roles;
 
     @Override

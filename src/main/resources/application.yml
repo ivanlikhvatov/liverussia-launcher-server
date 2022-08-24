@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mariadb://188.120.229.168:3306/LifeRussia
     username: launcherIvan
-    password: 1597538624
+    password: 2281337
 #  jpa:
 #    generate-ddl: true
 
@@ -30,6 +30,11 @@ vue-client:
   confirm-register-path: /registration/activate
   login: /login
 
+google:
+  recaptcha:
+    verification:
+      endpoint: https://www.google.com/recaptcha/api/siteverify
+      secret: 6Ldt5oAhAAAAAInVjY62F8MfKjnFWkx7aG19B-Mo
 
 jwt:
   secret:

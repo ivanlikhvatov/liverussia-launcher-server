@@ -5,8 +5,10 @@ import com.liverussia.dto.request.AuthenticationRequestDto;
 import com.liverussia.dto.response.AuthenticationResponseDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
+import com.liverussia.mapper.AuthenticationResponseDtoMapper;
 import com.liverussia.security.JwtProvider;
 import com.liverussia.service.AuthService;
+import com.liverussia.service.CaptchaRestService;
 import com.liverussia.service.RefreshTokenService;
 import com.liverussia.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -22,11 +24,19 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final JwtProvider jwtProvider;
+    private final CaptchaRestService captchaRestService;
 
     private final AuthenticationManager authenticationManager;
+    private final AuthenticationResponseDtoMapper authenticationResponseDtoMapper;
 
     @Override
     public AuthenticationResponseDto login(AuthenticationRequestDto request) {
+        boolean isValidCaptcha = captchaRestService.validateCaptcha(request.getCaptchaToken());
+
+        if (!isValidCaptcha) {
+            throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
+        }
+
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
 
         authenticateUser(request);
@@ -36,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenService.putNewToken(jwtUser.getLogin(), refreshToken);
 
-        return new AuthenticationResponseDto(accessToken, refreshToken);
+        return authenticationResponseDtoMapper.map(jwtUser, accessToken, refreshToken);
     }
 
     @Override
@@ -50,15 +60,15 @@ public class AuthServiceImpl implements AuthService {
                 JwtUser user = userService.getJwtUserByLogin(login);
                 String accessToken = jwtProvider.generateAccessToken(user);
 
-                return new AuthenticationResponseDto(accessToken, null);
+                return authenticationResponseDtoMapper.map(user, accessToken, null);
             }
         }
 
-        return new AuthenticationResponseDto(null, null);
+        throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
     }
 
     @Override
-    public AuthenticationResponseDto refresh(String refreshToken) {
+    public AuthenticationResponseDto refreshToken(String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String login = claims.getSubject();
@@ -71,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
                 String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 refreshTokenService.putNewToken(user.getLogin(), newRefreshToken);
 
-                return new AuthenticationResponseDto(accessToken, newRefreshToken);
+                return authenticationResponseDtoMapper.map(user, accessToken, newRefreshToken);
             }
         }
 

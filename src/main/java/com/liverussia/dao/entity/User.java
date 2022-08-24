@@ -26,4 +26,7 @@ public class User {
 
     @Formula("(select admins.level_admin from admins where admins.userid = id)")
     private Integer adminLevel;
+
+    @Formula("(select donate.rub from donate where donate.userid = id)")
+    private String balance;
 }

@@ -8,5 +8,5 @@ public interface AuthService {
 
     AuthenticationResponseDto getAccessToken(String refreshToken);
 
-    AuthenticationResponseDto refresh(String refreshToken);
+    AuthenticationResponseDto refreshToken(String refreshToken);
 }

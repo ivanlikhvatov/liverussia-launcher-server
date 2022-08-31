@@ -30,7 +30,7 @@ public class SecurityConfig {
     private String[] roleAdmin;
 
     @Value("${api.endpoints.roleAndroidUser}")
-    private String[] roleStudent;
+    private String[] roleAndroidUser;
 
     private final JwtFilter jwtFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
@@ -59,7 +59,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .antMatchers(roleAdmin)
                                 .hasAuthority(Role.ADMIN_LEVEL_10.name())
-                                .antMatchers(roleStudent)
+                                .antMatchers(roleAndroidUser)
                                 .hasAuthority(Role.ANDROID_USER.name())
                                 .anyRequest()
                                 .authenticated()

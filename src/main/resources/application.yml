@@ -20,9 +20,7 @@ api:
       /api/v1/auth/login,
       /api/v1/auth/token,
       /api/v1/auth/refresh,
-      /api/v1/auth/registration,
-      /api/v1/test/helloworld,
-      /api/v1/test/getFromDb
+      /api/v1/auth/registration
 
 
 vue-client:

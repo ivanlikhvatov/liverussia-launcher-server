@@ -1,7 +1,9 @@
 package com.liverussia.service.impl;
 
 import com.liverussia.domain.JwtUser;
+import com.liverussia.dto.request.AdminAuthenticationRequestDto;
 import com.liverussia.dto.request.AuthenticationRequestDto;
+import com.liverussia.dto.response.AdminAuthenticationResponseDto;
 import com.liverussia.dto.response.AuthenticationResponseDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
@@ -30,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationResponseDtoMapper authenticationResponseDtoMapper;
 
     @Override
-    public AuthenticationResponseDto login(AuthenticationRequestDto request) {
+    public AuthenticationResponseDto loginAndroidUser(AuthenticationRequestDto request) {
         boolean isValidCaptcha = captchaRestService.validateCaptcha(request.getCaptchaToken());
 
         if (!isValidCaptcha) {
@@ -39,14 +41,28 @@ public class AuthServiceImpl implements AuthService {
 
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
 
-        authenticateUser(request);
+        authenticateUser(request.getLogin(), request.getPassword());
 
         String accessToken = jwtProvider.generateAccessToken(jwtUser);
         String refreshToken = jwtProvider.generateRefreshToken(jwtUser);
 
         refreshTokenService.putNewToken(jwtUser.getLogin(), refreshToken);
 
-        return authenticationResponseDtoMapper.map(jwtUser, accessToken, refreshToken);
+        return authenticationResponseDtoMapper.mapAndroidUserResponse(jwtUser, accessToken, refreshToken);
+    }
+
+    @Override
+    public AdminAuthenticationResponseDto loginAdminUser(AdminAuthenticationRequestDto request) {
+        JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
+
+        authenticateUser(request.getLogin(), request.getPassword());
+
+        String accessToken = jwtProvider.generateAccessToken(jwtUser);
+        String refreshToken = jwtProvider.generateRefreshToken(jwtUser);
+
+        refreshTokenService.putNewToken(jwtUser.getLogin(), refreshToken);
+
+        return authenticationResponseDtoMapper.mapAdminResponse(jwtUser, accessToken, refreshToken);
     }
 
     @Override
@@ -60,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
                 JwtUser user = userService.getJwtUserByLogin(login);
                 String accessToken = jwtProvider.generateAccessToken(user);
 
-                return authenticationResponseDtoMapper.map(user, accessToken, null);
+                return authenticationResponseDtoMapper.mapAndroidUserResponse(user, accessToken, null);
             }
         }
 
@@ -68,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthenticationResponseDto refreshToken(String refreshToken) {
+    public AuthenticationResponseDto refreshAndroidUserToken(String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String login = claims.getSubject();
@@ -81,17 +97,35 @@ public class AuthServiceImpl implements AuthService {
                 String newRefreshToken = jwtProvider.generateRefreshToken(user);
                 refreshTokenService.putNewToken(user.getLogin(), newRefreshToken);
 
-                return authenticationResponseDtoMapper.map(user, accessToken, newRefreshToken);
+                return authenticationResponseDtoMapper.mapAndroidUserResponse(user, accessToken, newRefreshToken);
             }
         }
 
         throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
     }
 
-    private void authenticateUser(AuthenticationRequestDto request) {
-        String login = request.getLogin();
-        String password = request.getPassword();
+    @Override
+    public AdminAuthenticationResponseDto refreshAdminUserToken(String refreshToken) {
+        if (jwtProvider.validateRefreshToken(refreshToken)) {
+            Claims claims = jwtProvider.getRefreshClaims(refreshToken);
+            String login = claims.getSubject();
+            String saveRefreshToken = refreshTokenService.getTokenByLogin(login);
 
+            if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
+                JwtUser user = userService.getJwtUserByLogin(login);
+
+                String accessToken = jwtProvider.generateAccessToken(user);
+                String newRefreshToken = jwtProvider.generateRefreshToken(user);
+                refreshTokenService.putNewToken(user.getLogin(), newRefreshToken);
+
+                return authenticationResponseDtoMapper.mapAdminResponse(user, accessToken, newRefreshToken);
+            }
+        }
+
+        throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
+    }
+
+    private void authenticateUser(String login, String password) {
         UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(login, password);
 

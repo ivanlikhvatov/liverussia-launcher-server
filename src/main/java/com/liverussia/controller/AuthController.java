@@ -1,7 +1,9 @@
 package com.liverussia.controller;
 
+import com.liverussia.dto.request.AdminAuthenticationRequestDto;
 import com.liverussia.dto.request.AuthenticationRequestDto;
 import com.liverussia.dto.request.RefreshJwtRequestDto;
+import com.liverussia.dto.response.AdminAuthenticationResponseDto;
 import com.liverussia.dto.response.AuthenticationResponseDto;
 import com.liverussia.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +21,24 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
-    public AuthenticationResponseDto login(@RequestBody @Valid AuthenticationRequestDto request) {
-        return authService.login(request);
+    @PostMapping("/android/login")
+    public AuthenticationResponseDto loginAndroidUser(@RequestBody @Valid AuthenticationRequestDto request) {
+        return authService.loginAndroidUser(request);
     }
 
-    @PostMapping("/refresh")
-    public AuthenticationResponseDto getNewRefreshToken(@RequestBody @Valid RefreshJwtRequestDto request) {
-        return authService.refreshToken(request.getRefreshToken());
+    @PostMapping("/admin/login")
+    public AdminAuthenticationResponseDto loginAdminUser(@RequestBody @Valid AdminAuthenticationRequestDto request) {
+        return authService.loginAdminUser(request);
+    }
+
+    @PostMapping("/android/refresh")
+    public AuthenticationResponseDto refreshAndroidUserToken(@RequestBody @Valid RefreshJwtRequestDto request) {
+        return authService.refreshAndroidUserToken(request.getRefreshToken());
+    }
+
+    @PostMapping("/admin/refresh")
+    public AdminAuthenticationResponseDto refreshAdminToken(@RequestBody @Valid RefreshJwtRequestDto request) {
+        return authService.refreshAdminUserToken(request.getRefreshToken());
     }
 
 //    @PostMapping("/token")

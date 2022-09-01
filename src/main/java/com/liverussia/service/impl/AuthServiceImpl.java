@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
         boolean isValidCaptcha = captchaRestService.validateCaptcha(request.getCaptchaToken());
 
         if (!isValidCaptcha) {
-            throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
+            throw new ApiException(ErrorContainer.CAPTCHA_ERROR);
         }
 
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());

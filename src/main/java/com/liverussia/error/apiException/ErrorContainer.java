@@ -22,6 +22,8 @@ public enum ErrorContainer {
     USER_WITH_THIS_LOGIN_NOT_FOUND(217, "Пользователь с таким логином не найден", HttpStatus.BAD_REQUEST),
     TOKEN_EXPIRED(218, "Срок действия токена истек", HttpStatus.UNAUTHORIZED),
 
+    CAPTCHA_ERROR(219, "Попробуйте заново пройти google captcha", HttpStatus.UNAUTHORIZED),
+
     OTHER(999, "Other Type of Error. See error message", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private static final ErrorContainer[] VALUES = values();

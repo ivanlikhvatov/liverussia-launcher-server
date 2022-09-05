@@ -51,34 +51,48 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(JwtUser user) {
-        LocalDateTime now = LocalDateTime.now();
-        Instant accessExpirationInstant = now.plusMinutes(accessTokenExpirationMinutes)
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
 
-        Date accessExpiration = Date.from(accessExpirationInstant);
+        Date expiration = getExpiration(accessTokenExpirationMinutes);
+        Date issuedAt = getIssuedAt();
 
         return Jwts.builder()
                 .setSubject(user.getLogin())
-                .setExpiration(accessExpiration)
+                .setExpiration(expiration)
+                .setIssuedAt(issuedAt)
                 .signWith(jwtAccessSecret)
                 .claim(ROLES_LIST_NAME, user.getRoles())
                 .compact();
     }
 
     public String generateRefreshToken(JwtUser user) {
-        LocalDateTime now = LocalDateTime.now();
-        Instant refreshExpirationInstant = now.plusDays(refreshTokenExpirationDays)
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
-
-        Date refreshExpiration = Date.from(refreshExpirationInstant);
+        Date expiration = getExpiration(refreshTokenExpirationDays);
+        Date issuedAt = getIssuedAt();
 
         return Jwts.builder()
                 .setSubject(user.getLogin())
-                .setExpiration(refreshExpiration)
+                .setExpiration(expiration)
+                .setIssuedAt(issuedAt)
                 .signWith(jwtRefreshSecret)
                 .compact();
+    }
+
+    private Date getIssuedAt() {
+        LocalDateTime now = LocalDateTime.now();
+
+        Instant issuedAtInstant = now.atZone(ZoneId.systemDefault())
+                .toInstant();
+
+        return Date.from(issuedAtInstant);
+    }
+
+    private Date getExpiration(int expirationMinutes) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Instant expirationInstant = now.plusMinutes(expirationMinutes)
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+
+        return Date.from(expirationInstant);
     }
 
     public boolean validateAccessToken(String accessToken) {

@@ -52,7 +52,7 @@ public class JwtProvider {
 
     public String generateAccessToken(JwtUser user) {
 
-        Date expiration = getExpiration(accessTokenExpirationMinutes);
+        Date expiration = getAccessExpiration(accessTokenExpirationMinutes);
         Date issuedAt = getIssuedAt();
 
         return Jwts.builder()
@@ -65,7 +65,7 @@ public class JwtProvider {
     }
 
     public String generateRefreshToken(JwtUser user) {
-        Date expiration = getExpiration(refreshTokenExpirationDays);
+        Date expiration = getRefreshExpiration(refreshTokenExpirationDays);
         Date issuedAt = getIssuedAt();
 
         return Jwts.builder()
@@ -85,10 +85,20 @@ public class JwtProvider {
         return Date.from(issuedAtInstant);
     }
 
-    private Date getExpiration(int expirationMinutes) {
+    private Date getAccessExpiration(int expirationMinutes) {
         LocalDateTime now = LocalDateTime.now();
 
         Instant expirationInstant = now.plusMinutes(expirationMinutes)
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+
+        return Date.from(expirationInstant);
+    }
+
+    private Date getRefreshExpiration(int expirationDays) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Instant expirationInstant = now.plusDays(expirationDays)
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
 

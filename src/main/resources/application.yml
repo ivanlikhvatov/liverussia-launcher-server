@@ -33,8 +33,6 @@ api:
 
 vue-client:
   url: http://localhost:8080
-  confirm-register-path: /registration/activate
-  login: /login
 
 google:
   recaptcha:

@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 
 public class Base64Converter {
 
+
+
 //    public static String convertBase64ToPdf(ApproveDiseaseRequest request) throws IOException {
 //
 //        String dataDir = "/Users/ivanlikhvatov/Downloads/";
@@ -30,8 +32,8 @@ public class Base64Converter {
 //
 //    }
 
-    public static String encodeFileToBase64(String fileName) {
-        File file = new File(fileName);
+    public static String encodeFileToBase64(String path) {
+        File file = new File(path);
 
         byte[] encoded;
 

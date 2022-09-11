@@ -5,6 +5,7 @@ import com.liverussia.dto.response.PossiblePrizesInfoResponseDto;
 import com.liverussia.service.AndroidSettingService;
 import com.liverussia.utils.Base64Converter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,17 +17,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AndroidSettingServiceImpl implements AndroidSettingService {
 
+    private final static String POSSIBLE_PRIZES_DIRECTORY = "possible_prizes/";
+
     private final List<PossiblePrizeInfo> possiblePrizesInfo;
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @Override
     public PossiblePrizesInfoResponseDto getPossiblePrizesInfo() {
 
         PossiblePrizesInfoResponseDto possiblePrizesInfoResponseDto = new PossiblePrizesInfoResponseDto();
 
+        String path = uploadPath.concat(POSSIBLE_PRIZES_DIRECTORY);
+
         List<String> base64Images = Optional.ofNullable(possiblePrizesInfo)
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(PossiblePrizeInfo::getFileName)
+                .map(prizeInfo -> path.concat(prizeInfo.getFileName()))
                 .map(Base64Converter::encodeFileToBase64)
                 .collect(Collectors.toList());
 

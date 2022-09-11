@@ -1,6 +1,7 @@
 package com.liverussia.service.impl;
 
 import com.liverussia.domain.JwtUser;
+import com.liverussia.domain.Role;
 import com.liverussia.dto.request.AdminAuthenticationRequestDto;
 import com.liverussia.dto.request.AuthenticationRequestDto;
 import com.liverussia.dto.response.AdminAuthenticationResponseDto;
@@ -54,6 +55,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AdminAuthenticationResponseDto loginAdminUser(AdminAuthenticationRequestDto request) {
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
+
+        if(!jwtUser.getRoles().contains(Role.ADMIN_LEVEL_10)) {
+            throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
+        }
 
         authenticateUser(request.getLogin(), request.getPassword());
 

@@ -1,13 +1,13 @@
 package com.liverussia.service.impl;
 
-import com.liverussia.dao.entity.User;
+import com.liverussia.dao.entity.user.User;
 import com.liverussia.domain.JwtUser;
 import com.liverussia.dto.response.UserInfoDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
 import com.liverussia.mapper.JwtUserMapper;
 import com.liverussia.mapper.UserInfoDtoMapper;
-import com.liverussia.repository.UserRepository;
+import com.liverussia.dao.repository.UserRepository;
 import com.liverussia.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

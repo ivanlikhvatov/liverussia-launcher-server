@@ -1,6 +1,6 @@
 package com.liverussia.mapper;
 
-import com.liverussia.dao.entity.User;
+import com.liverussia.dao.entity.user.User;
 import com.liverussia.dto.response.UserInfoDto;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

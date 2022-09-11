@@ -1,9 +1,8 @@
 package com.liverussia.mapper;
 
-import com.liverussia.dao.entity.User;
+import com.liverussia.dao.entity.user.User;
 import com.liverussia.domain.JwtUser;
 import com.liverussia.domain.Role;
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

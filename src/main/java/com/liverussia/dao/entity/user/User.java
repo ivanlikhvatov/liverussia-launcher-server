@@ -1,4 +1,4 @@
-package com.liverussia.dao.entity;
+package com.liverussia.dao.entity.user;
 
 import lombok.Getter;
 import lombok.Setter;

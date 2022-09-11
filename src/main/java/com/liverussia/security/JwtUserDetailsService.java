@@ -1,7 +1,7 @@
 package com.liverussia.security;
 
 import com.liverussia.config.SaltPasswordEncoder;
-import com.liverussia.dao.entity.User;
+import com.liverussia.dao.entity.user.User;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
 import com.liverussia.mapper.JwtUserMapper;

@@ -1,7 +1,7 @@
 package com.liverussia.service.impl;
 
-import com.liverussia.dao.entity.RefreshToken;
-import com.liverussia.repository.RefreshTokenRepository;
+import com.liverussia.dao.entity.user.RefreshToken;
+import com.liverussia.dao.repository.RefreshTokenRepository;
 import com.liverussia.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

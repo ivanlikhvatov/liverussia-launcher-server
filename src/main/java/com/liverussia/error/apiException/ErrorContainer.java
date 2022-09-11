@@ -23,6 +23,7 @@ public enum ErrorContainer {
     TOKEN_EXPIRED(218, "Срок действия токена истек", HttpStatus.UNAUTHORIZED),
 
     CAPTCHA_ERROR(219, "Попробуйте заново пройти google captcha", HttpStatus.UNAUTHORIZED),
+    NOT_ENOUGH_MONEY(220, "Недостаточно денег", HttpStatus.BAD_REQUEST),
 
     OTHER(999, "Other Type of Error. See error message", HttpStatus.INTERNAL_SERVER_ERROR);
 

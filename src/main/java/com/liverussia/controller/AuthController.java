@@ -26,20 +26,22 @@ public class AuthController {
         return authService.loginAndroidUser(request);
     }
 
-    @PostMapping("/admin/login")
-    public AdminAuthenticationResponseDto loginAdminUser(@RequestBody @Valid AdminAuthenticationRequestDto request) {
-        return authService.loginAdminUser(request);
-    }
-
     @PostMapping("/android/refresh")
     public AuthenticationResponseDto refreshAndroidUserToken(@RequestBody @Valid RefreshJwtRequestDto request) {
         return authService.refreshAndroidUserToken(request.getRefreshToken());
     }
 
-    @PostMapping("/admin/refresh")
-    public AdminAuthenticationResponseDto refreshAdminToken(@RequestBody @Valid RefreshJwtRequestDto request) {
-        return authService.refreshAdminUserToken(request.getRefreshToken());
-    }
+    //TODO когда буду писать UI под настройку рулетки
+//    @PostMapping("/admin/login")
+//    public AdminAuthenticationResponseDto loginAdminUser(@RequestBody @Valid AdminAuthenticationRequestDto request) {
+//        return authService.loginAdminUser(request);
+//    }
+
+    //TODO когда буду писать UI под настройку рулетки
+//    @PostMapping("/admin/refresh")
+//    public AdminAuthenticationResponseDto refreshAdminToken(@RequestBody @Valid RefreshJwtRequestDto request) {
+//        return authService.refreshAdminUserToken(request.getRefreshToken());
+//    }
 
 //    @PostMapping("/token")
 //    public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody @Valid RefreshJwtRequest request) {

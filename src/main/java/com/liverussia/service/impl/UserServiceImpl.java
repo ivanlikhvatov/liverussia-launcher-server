@@ -2,6 +2,7 @@ package com.liverussia.service.impl;
 
 import com.liverussia.dao.entity.user.User;
 import com.liverussia.domain.JwtUser;
+import com.liverussia.dto.response.SpinRouletteResponseDto;
 import com.liverussia.dto.response.UserInfoDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;

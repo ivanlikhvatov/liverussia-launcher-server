@@ -30,7 +30,7 @@ public class RouletteServiceImpl implements RouletteService {
     private final UserService userService;
 
     @Value("${android.roulette.spinCost}")
-    private long spinCost;
+    private Integer spinCost;
 
     @Value("${android.roulette.countElementsInOneSpin}")
     private Integer countElementsInOneSpin;
@@ -53,8 +53,7 @@ public class RouletteServiceImpl implements RouletteService {
 
         //choose prize and build request logic
 
-
-        return buildRouletteResponseDto();
+        return buildRouletteResponseDto(jwtUser);
     }
 
     private void checkUserBalance(UserInfoDto user) {
@@ -69,7 +68,7 @@ public class RouletteServiceImpl implements RouletteService {
         }
     }
 
-    private SpinRouletteResponseDto buildRouletteResponseDto() {
+    private SpinRouletteResponseDto buildRouletteResponseDto(JwtUser user) {
         SpinRouletteResponseDto responseDto = new SpinRouletteResponseDto();
 
         responseDto.setCountElementsInOneSpin(countElementsInOneSpin.toString());
@@ -77,6 +76,9 @@ public class RouletteServiceImpl implements RouletteService {
 
         responseDto.setBase64Images(buildRouletteBase64Images());
         responseDto.setPrizeInfo(buildPrizeInfo());
+
+        int currentBalance = Integer.parseInt(user.getBalance()) - spinCost;
+        responseDto.setBalance(Integer.toString(currentBalance));
 
         return responseDto;
     }

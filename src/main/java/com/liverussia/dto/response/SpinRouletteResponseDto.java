@@ -10,4 +10,5 @@ public class SpinRouletteResponseDto {
     private List<String> base64Images;
     private String countElementsInOneSpin;
     private String spinDurationInMillis;
+    private String balance;
 }

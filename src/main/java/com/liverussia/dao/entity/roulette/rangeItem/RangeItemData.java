@@ -12,8 +12,8 @@ import javax.persistence.*;
 public class RangeItemData {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "range_start")
     private Long rangeStart;

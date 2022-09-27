@@ -11,12 +11,12 @@ import javax.persistence.*;
 @Table(name = "r_item_category")
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "name")
     private CategoryName name;
 
-    @Column(name = "probability")
-    private String probability;
+    @Column(name = "percent_probability")
+    private Long percentProbability;
 }

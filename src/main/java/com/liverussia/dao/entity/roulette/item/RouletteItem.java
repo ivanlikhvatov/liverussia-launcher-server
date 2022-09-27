@@ -11,11 +11,11 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "roulette_item")
+@Table(name = "r_roulette_item")
 public class RouletteItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "name")
     private String name;

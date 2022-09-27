@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Table(name = "r_composite_items")
 public class CompositeItems {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "type")
     private CompositeElementType type;

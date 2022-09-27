@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Table(name = "r_single_item_data")
 public class SingleItemData {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(name = "samp_element_id")
     private String sampElementId;

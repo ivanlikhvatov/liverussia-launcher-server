@@ -22,6 +22,7 @@ public class RangeItemData {
     private Long rangeEnd;
 
     @Column(name = "range_element_type")
+    @Enumerated(EnumType.STRING)
     private RangeElementType rangeElementType;
 
     @Column(name = "prize_image_file_name")

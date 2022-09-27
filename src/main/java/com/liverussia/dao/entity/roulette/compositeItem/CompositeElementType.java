@@ -10,5 +10,6 @@ public enum CompositeElementType {
     MASK,
     SKIN,
     BACKPACK,
-    GUN
+    GUN,
+    CAP
 }

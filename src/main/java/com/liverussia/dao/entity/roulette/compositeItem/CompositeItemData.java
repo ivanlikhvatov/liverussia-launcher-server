@@ -15,5 +15,6 @@ public class CompositeItemData {
     private Long id;
 
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private CompositeElementType type;
 }

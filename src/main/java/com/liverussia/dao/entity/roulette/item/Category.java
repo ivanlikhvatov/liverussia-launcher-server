@@ -15,6 +15,7 @@ public class Category {
     private Long id;
 
     @Column(name = "name")
+    @Enumerated(EnumType.STRING)
     private CategoryName name;
 
     @Column(name = "percent_probability")

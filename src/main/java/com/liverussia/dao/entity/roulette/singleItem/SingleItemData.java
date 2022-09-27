@@ -18,6 +18,7 @@ public class SingleItemData {
     private String sampElementId;
 
     @Column(name = "single_element_type")
+    @Enumerated(EnumType.STRING)
     private SingleElementType singleElementType;
 
     @Column(name = "prize_image_file_name")

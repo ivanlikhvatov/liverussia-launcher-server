@@ -28,6 +28,7 @@ public class RouletteItem {
     private String imageFileName;
 
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private RouletteItemType type;
 
     @OneToOne(fetch = FetchType.EAGER)

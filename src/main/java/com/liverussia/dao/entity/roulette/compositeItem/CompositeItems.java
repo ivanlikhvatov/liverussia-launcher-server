@@ -15,6 +15,7 @@ public class CompositeItems {
     private Long id;
 
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private CompositeElementType type;
 
     @Column(name = "image_file_name")

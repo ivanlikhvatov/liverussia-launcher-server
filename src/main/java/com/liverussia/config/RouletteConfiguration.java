@@ -28,7 +28,9 @@ public class RouletteConfiguration {
                 new PossiblePrizeInfo("removing_one_warning.png", 14),
                 new PossiblePrizeInfo("lamborghini_huracan.png", 15),
                 new PossiblePrizeInfo("mercedes_benz_gt_63_s.png", 16),
-                new PossiblePrizeInfo("random_mask.png", 17)
+                new PossiblePrizeInfo("random_mask.png", 17),
+                new PossiblePrizeInfo("platinum_vip.png", 18),
+                new PossiblePrizeInfo("random_cap.png", 19)
         );
     }
 }

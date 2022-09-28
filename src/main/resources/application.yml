@@ -59,7 +59,7 @@ jwt:
 
 android:
   roulette:
-    countElementsInOneSpin: 104
+    countElementsInOneSpin: 100
     spinDurationInMillis: 8000
     spinCost: 50
 

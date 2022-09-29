@@ -1,8 +1,11 @@
 package com.liverussia.dao.entity.roulette.singleItem;
 
+import com.liverussia.error.apiException.ErrorContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
@@ -18,4 +21,12 @@ public enum SingleElementType {
 
     private final String sampType;
     private final String sampValue;
+
+    public static SingleElementType of(String value) {
+        return Arrays.stream(values())
+                .filter(type ->
+                        type.getSampType().equals(value))
+                .findFirst()
+                .orElse(null);
+    }
 }

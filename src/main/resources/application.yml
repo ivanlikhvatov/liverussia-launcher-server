@@ -6,11 +6,11 @@ server:
 #    url: jdbc:mariadb://188.120.229.168:3306/LifeRussia
 #    username: launcherIvan
 #    password: 2281337
-spring:
-  datasource:
-    url: jdbc:mariadb://localhost:3306/liverussia_test
-    username: root
-    password: 122021
+#spring:
+#  datasource:
+#    url: jdbc:mariadb://localhost:3306/liverussia_test
+#    username: root
+#    password: 122021
 
 #  jpa:
 #    hibernate:
@@ -19,6 +19,20 @@ spring:
 #    properties:
 #      hibernate:
 #        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+
+spring:
+  datasource:
+    user:
+      url: jdbc:mariadb://localhost:3306/liverussia_test
+      username: root
+      password: 122021
+      driverClassname: org.mariadb.jdbc.Driver
+    roulette:
+      url: jdbc:mariadb://localhost:3306/launcher_roulette
+      username: root
+      password: 122021
+      driverClassname: org.mariadb.jdbc.Driver
 
 api:
   prefix: /api/v1

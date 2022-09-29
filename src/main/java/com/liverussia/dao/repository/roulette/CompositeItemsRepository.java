@@ -1,4 +1,4 @@
-package com.liverussia.dao.repository;
+package com.liverussia.dao.repository.roulette;
 
 import com.liverussia.dao.entity.roulette.compositeItem.CompositeElementType;
 import com.liverussia.dao.entity.roulette.compositeItem.CompositeItems;

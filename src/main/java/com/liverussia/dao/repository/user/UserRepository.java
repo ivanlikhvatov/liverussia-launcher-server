@@ -1,4 +1,4 @@
-package com.liverussia.dao.repository;
+package com.liverussia.dao.repository.user;
 
 import com.liverussia.dao.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

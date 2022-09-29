@@ -1,4 +1,4 @@
-package com.liverussia.dao.repository;
+package com.liverussia.dao.repository.roulette;
 
 import com.liverussia.dao.entity.roulette.item.Category;
 import org.springframework.data.jpa.repository.JpaRepository;

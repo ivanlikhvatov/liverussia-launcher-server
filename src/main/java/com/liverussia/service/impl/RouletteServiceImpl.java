@@ -254,8 +254,6 @@ public class RouletteServiceImpl implements RouletteService {
                 .orElse(Collections.emptyList())
                 .forEach(category -> addItemsByCategory(category, rouletteItems));
 
-        //TODO сортирвока плохо сортирует?
-        Collections.shuffle(rouletteItems);
         Collections.shuffle(rouletteItems);
 
         return rouletteItems;
@@ -264,6 +262,8 @@ public class RouletteServiceImpl implements RouletteService {
 
     private void addItemsByCategory(Category category, List<RouletteItem> rouletteItems) {
         List<RouletteItem> rouletteItemsByCategory = rouletteItemRepository.findAllByCategoryId(category.getId());
+        Collections.shuffle(rouletteItemsByCategory);
+
         long residualCount = getItemCount(category);
 
         for (int i = 0; i < rouletteItemsByCategory.size(); i++) {

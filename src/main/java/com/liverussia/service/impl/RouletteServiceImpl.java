@@ -1,20 +1,21 @@
 package com.liverussia.service.impl;
 
-import com.liverussia.dao.entity.roulette.compositeItem.CompositeElementType;
 import com.liverussia.dao.entity.roulette.compositeItem.CompositeItemData;
 import com.liverussia.dao.entity.roulette.compositeItem.CompositeItems;
 import com.liverussia.dao.entity.roulette.item.Category;
 import com.liverussia.dao.entity.roulette.item.RouletteItem;
 import com.liverussia.dao.entity.roulette.item.RouletteItemType;
+import com.liverussia.dao.entity.roulette.rangeItem.RangeElementType;
 import com.liverussia.dao.entity.roulette.rangeItem.RangeItemData;
+import com.liverussia.dao.entity.roulette.singleItem.SingleElementType;
 import com.liverussia.dao.entity.roulette.singleItem.SingleItemData;
-import com.liverussia.dao.repository.CategoryRepository;
-import com.liverussia.dao.repository.CompositeItemsRepository;
-import com.liverussia.dao.repository.RouletteItemRepository;
+import com.liverussia.dao.entity.user.Donate;
+import com.liverussia.dao.entity.user.RoulettePrizes;
+import com.liverussia.dao.entity.user.User;
+import com.liverussia.dao.repository.*;
 import com.liverussia.domain.JwtUser;
 import com.liverussia.dto.response.PrizeInfoResponseDto;
 import com.liverussia.dto.response.SpinRouletteResponseDto;
-import com.liverussia.dto.response.UserInfoDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
 import com.liverussia.service.RouletteService;
@@ -25,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -47,6 +47,8 @@ public class RouletteServiceImpl implements RouletteService {
     private final RouletteItemRepository rouletteItemRepository;
     private final CompositeItemsRepository compositeItemsRepository;
     private final CategoryRepository categoryRepository;
+    private final DonateRepository donateRepository;
+    private final RoulettePrizesRepository roulettePrizesRepository;
 
     @Value("${android.roulette.spinCost}")
     private Integer spinCost;
@@ -63,34 +65,47 @@ public class RouletteServiceImpl implements RouletteService {
 
     @Override
     public SpinRouletteResponseDto spinRoulette(JwtUser jwtUser) {
-        checkUser(jwtUser);
+        User user = userService.getUserByLogin(jwtUser.getLogin());
+        checkUserBalance(user);
 
         List<RouletteItem> rouletteItems = getRouletteItems();
 
-        SpinRouletteResponseDto response = buildRouletteResponseDto(jwtUser);
+        SpinRouletteResponseDto response = buildRouletteResponseDto();
         response.setBase64Images(getRouletteItemsImages(rouletteItems));
-        addPrizeToResponseAndSave(response, rouletteItems);
+        addPrizeToResponseAndSave(response, rouletteItems, user);
 
         return response;
     }
 
-    private void addPrizeToResponseAndSave(SpinRouletteResponseDto response, List<RouletteItem> rouletteItems) {
+    private void addPrizeToResponseAndSave(SpinRouletteResponseDto response, List<RouletteItem> rouletteItems, User user) {
         RouletteItem prizeItem = rouletteItems.get(rouletteItems.size() - COUNT_ITEM_BEFORE_PRIZE);
 
         if (RouletteItemType.SINGLE.equals(prizeItem.getType())) {
-            handleSingleType(response, prizeItem);
+            handleSingleType(response, prizeItem, user);
         }
 
         if (RouletteItemType.RANGE.equals(prizeItem.getType())) {
-            handleRangeType(response, prizeItem);
+            handleRangeType(response, prizeItem, user);
         }
 
         if (RouletteItemType.COMPOSITE.equals(prizeItem.getType())) {
-            handleCompositeType(response, prizeItem);
+            handleCompositeType(response, prizeItem, user);
         }
+
+        processRouletteSpinPay(user);
+        response.setBalance(user.getBalance());
     }
 
-    private void handleCompositeType(SpinRouletteResponseDto response, RouletteItem rouletteItem) {
+    private void processRouletteSpinPay(User user) {
+        Donate donate = donateRepository.findByUserId(user.getId());
+        Integer newBalance = donate.getBalance() - spinCost;
+        donate.setBalance(newBalance);
+        user.setBalance(newBalance.toString());
+
+        donateRepository.save(donate);
+    }
+
+    private void handleCompositeType(SpinRouletteResponseDto response, RouletteItem rouletteItem, User user) {
         CompositeItemData compositeItemData = rouletteItem.getCompositeItemData();
         CompositeItems compositeItem = getCompositeItem(compositeItemData);
 
@@ -98,9 +113,13 @@ public class RouletteServiceImpl implements RouletteService {
         PrizeInfoResponseDto prizeInfo = new PrizeInfoResponseDto();
         prizeInfo.setBase64Image(base64PrizeImage);
 
-//        saveCompositeToDb(compositeItem);
+        saveCompositeTypePrize(compositeItem, user);
 
         response.setPrizeInfo(prizeInfo);
+    }
+
+    private void saveCompositeTypePrize(CompositeItems compositeItem, User user) {
+        savePrizeToDb(compositeItem.getType().getSampType(), compositeItem.getSampElementId(), user.getId());
     }
 
     private String getCompositePrizeImage(CompositeItems compositeItem) {
@@ -122,7 +141,7 @@ public class RouletteServiceImpl implements RouletteService {
         return compositeItems.get(index);
     }
 
-    private void handleRangeType(SpinRouletteResponseDto response, RouletteItem rouletteItem) {
+    private void handleRangeType(SpinRouletteResponseDto response, RouletteItem rouletteItem, User user) {
         String base64PrizeImage = getRangePrizeImage(rouletteItem);
         String rangeRandomValue = getRangeRandomValue(rouletteItem);
 
@@ -132,7 +151,19 @@ public class RouletteServiceImpl implements RouletteService {
 
         response.setPrizeInfo(prizeInfo);
 
-//        saveToDb(prizeInfo, rangeRandomValue);
+        saveRangeTypePrize(rouletteItem, rangeRandomValue, user);
+    }
+
+    private void saveRangeTypePrize(RouletteItem rouletteItem, String rangeRandomValue, User user) {
+        RangeElementType type = getRangeItemType(rouletteItem);
+        savePrizeToDb(type.getSampType(), rangeRandomValue, user.getId());
+    }
+
+    private RangeElementType getRangeItemType(RouletteItem rouletteItem) {
+        return Optional.ofNullable(rouletteItem)
+                .map(RouletteItem::getRangeItemData)
+                .map(RangeItemData::getRangeElementType)
+                .orElseThrow(() -> new ApiException(ErrorContainer.OTHER));
     }
 
     private String getRangeRandomValue(RouletteItem rouletteItem) {
@@ -156,13 +187,38 @@ public class RouletteServiceImpl implements RouletteService {
                 .orElse(StringUtils.EMPTY);
     }
 
-    private void handleSingleType(SpinRouletteResponseDto response, RouletteItem rouletteItem) {
+    private void handleSingleType(SpinRouletteResponseDto response, RouletteItem rouletteItem, User user) {
         String base64PrizeImage = getSinglePrizeImage(rouletteItem);
         PrizeInfoResponseDto prizeInfo = new PrizeInfoResponseDto();
         prizeInfo.setBase64Image(base64PrizeImage);
         response.setPrizeInfo(prizeInfo);
 
-//        saveToDb(prizeInfo);
+        saveSingleTypePrize(rouletteItem, user);
+    }
+
+    private void saveSingleTypePrize(RouletteItem rouletteItem, User user) {
+        SingleElementType type = getSingleItemType(rouletteItem);
+
+        if (SingleElementType.CAR.equals(type)) {
+            String sampId = getSingleItemSampId(rouletteItem);
+            savePrizeToDb(SingleElementType.CAR.getSampType(), sampId, user.getId());
+        }
+
+        savePrizeToDb(type.getSampType(), type.getSampValue(), user.getId());
+    }
+
+    private String getSingleItemSampId(RouletteItem rouletteItem) {
+        return Optional.ofNullable(rouletteItem)
+                .map(RouletteItem::getSingleItemData)
+                .map(SingleItemData::getSampElementId)
+                .orElseThrow(() -> new ApiException(ErrorContainer.OTHER));
+    }
+
+    private SingleElementType getSingleItemType(RouletteItem rouletteItem) {
+        return Optional.ofNullable(rouletteItem)
+                .map(RouletteItem::getSingleItemData)
+                .map(SingleItemData::getSingleElementType)
+                .orElseThrow(() -> new ApiException(ErrorContainer.OTHER));
     }
 
     private String getSinglePrizeImage(RouletteItem rouletteItem) {
@@ -198,10 +254,7 @@ public class RouletteServiceImpl implements RouletteService {
                 .orElse(Collections.emptyList())
                 .forEach(category -> addItemsByCategory(category, rouletteItems));
 
-//        Optional.of(existRouletteItems)
-//                .orElse(Collections.emptyList())
-//                .forEach(item -> addNeedCountsItems(rouletteItems, item));
-
+        //TODO сортирвока плохо сортирует?
         Collections.shuffle(rouletteItems);
         Collections.shuffle(rouletteItems);
 
@@ -248,15 +301,7 @@ public class RouletteServiceImpl implements RouletteService {
                 .orElse(ZERO_PROBABILITY);
     }
 
-    private void checkUser(JwtUser jwtUser) {
-        Optional.ofNullable(jwtUser)
-                .orElseThrow(() -> new ApiException(ErrorContainer.AUTHENTICATION_ERROR));
-
-        UserInfoDto user = userService.getUserInfo(jwtUser);
-        checkUserBalance(user);
-    }
-
-    private void checkUserBalance(UserInfoDto user) {
+    private void checkUserBalance(User user) {
         if (StringUtils.isBlank(user.getBalance())) {
             throw new ApiException(ErrorContainer.NOT_ENOUGH_MONEY);
         }
@@ -268,26 +313,32 @@ public class RouletteServiceImpl implements RouletteService {
         }
     }
 
-    private SpinRouletteResponseDto buildRouletteResponseDto(JwtUser user) {
+    private SpinRouletteResponseDto buildRouletteResponseDto() {
         SpinRouletteResponseDto responseDto = new SpinRouletteResponseDto();
 
         responseDto.setCountElementsInOneSpin(countElementsInOneSpin.toString());
         responseDto.setSpinDurationInMillis(spinDurationInMillis.toString());
 
-        int currentBalance = Integer.parseInt(user.getBalance()) - spinCost;
-        responseDto.setBalance(Integer.toString(currentBalance));
-
         return responseDto;
     }
 
-    private PrizeInfoResponseDto buildPrizeInfo() {
+    private void savePrizeToDb(String type, String value, String userId) {
 
-        String path = uploadPath.concat(PRIZES_INFO_DIRECTORY).concat("experience.png");
+        if (StringUtils.isBlank(value)) {
+            value = null;
+        }
 
-        PrizeInfoResponseDto prizeInfoResponseDto = new PrizeInfoResponseDto();
-        prizeInfoResponseDto.setBase64Image(Base64Converter.encodeFileToBase64(path));
-        prizeInfoResponseDto.setAdditionalInfo("6 EXP");
+        RoulettePrizes roulettePrizes = buildRoulettePrizeEntity(type, value, userId);
+        roulettePrizesRepository.save(roulettePrizes);
+    }
 
-        return prizeInfoResponseDto;
+    private RoulettePrizes buildRoulettePrizeEntity(String type, String value, String userId) {
+
+        RoulettePrizes roulettePrize = new RoulettePrizes();
+        roulettePrize.setType(type);
+        roulettePrize.setValue(value);
+        roulettePrize.setUserId(userId);
+
+        return roulettePrize;
     }
 }

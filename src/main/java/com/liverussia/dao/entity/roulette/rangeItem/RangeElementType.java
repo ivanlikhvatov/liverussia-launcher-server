@@ -6,7 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RangeElementType {
-    GAME_CURRENCY,
-    EXPERIENCE,
-    LIVE_COINS
+    GAME_CURRENCY("0"),
+    EXPERIENCE("1"),
+    LIVE_COINS("7");
+
+    private final String sampType;
 }

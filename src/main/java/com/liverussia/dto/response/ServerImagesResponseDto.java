@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PossiblePrizesInfoResponseDto {
+public class ServerImagesResponseDto {
     private List<String> base64Images;
 }

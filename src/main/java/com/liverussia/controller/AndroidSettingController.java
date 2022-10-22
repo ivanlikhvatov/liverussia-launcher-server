@@ -1,6 +1,6 @@
 package com.liverussia.controller;
 
-import com.liverussia.dto.response.PossiblePrizesInfoResponseDto;
+import com.liverussia.dto.response.ServerImagesResponseDto;
 import com.liverussia.service.AndroidSettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +15,12 @@ public class AndroidSettingController {
     private final AndroidSettingService androidSettingService;
 
     @GetMapping("/prizes/info")
-    public PossiblePrizesInfoResponseDto getPossiblePrizesInfo() {
+    public ServerImagesResponseDto getPossiblePrizesInfo() {
         return androidSettingService.getPossiblePrizesInfo();
+    }
+
+    @GetMapping("/donate/services")
+    public ServerImagesResponseDto getDonateServicesInfo() {
+        return androidSettingService.getDonateServicesInfo();
     }
 }

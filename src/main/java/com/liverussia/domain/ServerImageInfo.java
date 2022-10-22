@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PossiblePrizeInfo {
+public class ServerImageInfo {
     private String fileName;
     private int position;
-
-
 }

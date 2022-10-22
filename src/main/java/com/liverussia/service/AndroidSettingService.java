@@ -1,7 +1,9 @@
 package com.liverussia.service;
 
-import com.liverussia.dto.response.PossiblePrizesInfoResponseDto;
+import com.liverussia.dto.response.ServerImagesResponseDto;
 
 public interface AndroidSettingService {
-    PossiblePrizesInfoResponseDto getPossiblePrizesInfo();
+    ServerImagesResponseDto getPossiblePrizesInfo();
+
+    ServerImagesResponseDto getDonateServicesInfo();
 }

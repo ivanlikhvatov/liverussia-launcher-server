@@ -31,6 +31,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         Optional.ofNullable(user)
                 .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
 
+        //TODO затестить это при нагрузке
         saltPasswordEncoder.setSalt(user.getSalt());
 
         return jwtUserMapper.map(user);

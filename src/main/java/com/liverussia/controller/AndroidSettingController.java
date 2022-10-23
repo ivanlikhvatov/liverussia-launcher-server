@@ -1,5 +1,6 @@
 package com.liverussia.controller;
 
+import com.liverussia.dto.response.LoaderSliderInfoResponseDto;
 import com.liverussia.dto.response.ServerImagesResponseDto;
 import com.liverussia.service.AndroidSettingService;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,10 @@ public class AndroidSettingController {
     @GetMapping("/donate/services")
     public ServerImagesResponseDto getDonateServicesInfo() {
         return androidSettingService.getDonateServicesInfo();
+    }
+
+    @GetMapping("/loader/slider/info")
+    public LoaderSliderInfoResponseDto getLoaderSliderInfo() {
+        return androidSettingService.getLoaderSliderInfo();
     }
 }

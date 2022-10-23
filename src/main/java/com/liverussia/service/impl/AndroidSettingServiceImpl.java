@@ -1,6 +1,7 @@
 package com.liverussia.service.impl;
 
 import com.liverussia.domain.ServerImageInfo;
+import com.liverussia.dto.response.LoaderSliderInfoResponseDto;
 import com.liverussia.dto.response.ServerImagesResponseDto;
 import com.liverussia.service.AndroidSettingService;
 import com.liverussia.utils.Base64Converter;
@@ -22,6 +23,7 @@ public class AndroidSettingServiceImpl implements AndroidSettingService {
 
     private final List<ServerImageInfo> possiblePrizesInfo;
     private final List<ServerImageInfo> donateServicesInfo;
+    private final List<String> loaderSliderTexts;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -61,5 +63,13 @@ public class AndroidSettingServiceImpl implements AndroidSettingService {
         possiblePrizesInfoResponseDto.setBase64Images(base64Images);
 
         return possiblePrizesInfoResponseDto;
+    }
+
+    @Override
+    public LoaderSliderInfoResponseDto getLoaderSliderInfo() {
+        LoaderSliderInfoResponseDto responseDto = new LoaderSliderInfoResponseDto();
+        responseDto.setTexts(loaderSliderTexts);
+
+        return responseDto;
     }
 }

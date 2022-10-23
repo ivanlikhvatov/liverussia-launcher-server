@@ -52,4 +52,16 @@ public class RouletteConfiguration {
                 new ServerImageInfo("platinum_vip.png", 12)
         );
     }
+
+    @Bean
+    public List<String> loaderSliderTexts() {
+        return List.of(
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+        );
+    }
 }

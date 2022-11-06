@@ -1,9 +1,7 @@
 package com.liverussia.controller;
 
-import com.liverussia.dto.request.AdminAuthenticationRequestDto;
 import com.liverussia.dto.request.AuthenticationRequestDto;
 import com.liverussia.dto.request.RefreshJwtRequestDto;
-import com.liverussia.dto.response.AdminAuthenticationResponseDto;
 import com.liverussia.dto.response.AuthenticationResponseDto;
 import com.liverussia.service.AuthService;
 import lombok.RequiredArgsConstructor;

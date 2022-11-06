@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class RouletteConfiguration {
+public class LauncherConfiguration {
 
     @Bean
     public List<ServerImageInfo> possiblePrizesInfo() {
@@ -56,12 +56,14 @@ public class RouletteConfiguration {
     @Bean
     public List<String> loaderSliderTexts() {
         return List.of(
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6"
+                "Главный Администратор выдает окончательный ответ в жалобах",
+                "Администратор никогда не попросит Вашего пароля",
+                "В нашей группе есть бот для привязки и восстановления доступа к аккаунту",
+                "\"LIVE RUSSIA\" - один из крупных мобильных CRMP проектов в СНГ",
+                "Вид от 1-го лица включается обычным свайпом двумя пальцами",
+                "Машину можно купить не имея дома",
+                "Администрация набирается через форум liverussia.online",
+                "Основатель \"LIVE RUSSIA\" является ютубером"
         );
     }
 }

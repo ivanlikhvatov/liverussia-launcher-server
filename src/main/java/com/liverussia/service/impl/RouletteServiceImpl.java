@@ -1,14 +1,11 @@
 package com.liverussia.service.impl;
 
-import com.liverussia.dao.entity.roulette.compositeItem.CompositeItemData;
-import com.liverussia.dao.entity.roulette.compositeItem.CompositeItems;
-import com.liverussia.dao.entity.roulette.item.Category;
-import com.liverussia.dao.entity.roulette.item.RouletteItem;
+import com.liverussia.dao.entity.roulette.compositeItem.CompositeItemsEntity;
+import com.liverussia.dao.entity.roulette.item.CategoryEntity;
+import com.liverussia.dao.entity.roulette.item.RouletteItemEntity;
 import com.liverussia.dao.entity.roulette.item.RouletteItemType;
 import com.liverussia.dao.entity.roulette.rangeItem.RangeElementType;
-import com.liverussia.dao.entity.roulette.rangeItem.RangeItemData;
 import com.liverussia.dao.entity.roulette.singleItem.SingleElementType;
-import com.liverussia.dao.entity.roulette.singleItem.SingleItemData;
 import com.liverussia.dao.entity.user.Donate;
 import com.liverussia.dao.entity.user.RoulettePrizes;
 import com.liverussia.dao.entity.user.User;
@@ -18,10 +15,15 @@ import com.liverussia.dao.repository.roulette.RouletteItemRepository;
 import com.liverussia.dao.repository.user.DonateRepository;
 import com.liverussia.dao.repository.user.RoulettePrizesRepository;
 import com.liverussia.domain.JwtUser;
+import com.liverussia.domain.roulette.CompositeItemData;
+import com.liverussia.domain.roulette.RangeItemData;
+import com.liverussia.domain.roulette.RouletteItem;
+import com.liverussia.domain.roulette.SingleItemData;
 import com.liverussia.dto.response.PrizeInfoResponseDto;
 import com.liverussia.dto.response.SpinRouletteResponseDto;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
+import com.liverussia.service.ResourceRestService;
 import com.liverussia.service.RouletteService;
 import com.liverussia.service.UserService;
 import com.liverussia.utils.Base64Converter;
@@ -38,14 +40,11 @@ import java.util.stream.LongStream;
 @RequiredArgsConstructor
 public class RouletteServiceImpl implements RouletteService {
 
-    //TODO вынести это в yml
-    private final static String ROULETTE_ITEMS_DIRECTORY = "roulette_items/";
-    private final static String PRIZES_INFO_DIRECTORY = "prizes_info/";
-
     private final static long ZERO = 0L;
     private final static long ZERO_PROBABILITY = 0L;
     private final static long ONE_HUNDRED_PERCENT = 100;
     private final static int COUNT_ITEM_BEFORE_PRIZE = 2;
+    private final static String EMPTY_PRIZE_VALUE = "0";
 
     private final UserService userService;
     private final RouletteItemRepository rouletteItemRepository;
@@ -53,6 +52,7 @@ public class RouletteServiceImpl implements RouletteService {
     private final CategoryRepository categoryRepository;
     private final DonateRepository donateRepository;
     private final RoulettePrizesRepository roulettePrizesRepository;
+    private final ResourceRestService resourceRestService;
 
     @Value("${android.roulette.spinCost}")
     private Integer spinCost;
@@ -62,9 +62,6 @@ public class RouletteServiceImpl implements RouletteService {
 
     @Value("${android.roulette.spinDurationInMillis}")
     private Long spinDurationInMillis;
-
-    @Value("${upload.path}")
-    private String uploadPath;
 
 
     @Override
@@ -111,7 +108,7 @@ public class RouletteServiceImpl implements RouletteService {
 
     private void handleCompositeType(SpinRouletteResponseDto response, RouletteItem rouletteItem, User user) {
         CompositeItemData compositeItemData = rouletteItem.getCompositeItemData();
-        CompositeItems compositeItem = getCompositeItem(compositeItemData);
+        CompositeItemsEntity compositeItem = getCompositeItem(compositeItemData);
 
         String base64PrizeImage = getCompositePrizeImage(compositeItem);
         PrizeInfoResponseDto prizeInfo = new PrizeInfoResponseDto();
@@ -122,22 +119,20 @@ public class RouletteServiceImpl implements RouletteService {
         response.setPrizeInfo(prizeInfo);
     }
 
-    private void saveCompositeTypePrize(CompositeItems compositeItem, User user) {
+    private void saveCompositeTypePrize(CompositeItemsEntity compositeItem, User user) {
         savePrizeToDb(compositeItem.getType().getSampType(), compositeItem.getSampElementId(), user.getId());
     }
 
-    private String getCompositePrizeImage(CompositeItems compositeItem) {
-        String path = uploadPath.concat(PRIZES_INFO_DIRECTORY);
-
+    private String getCompositePrizeImage(CompositeItemsEntity compositeItem) {
         return Optional.ofNullable(compositeItem)
-                .map(CompositeItems::getImageFileName)
-                .map(path::concat)
+                .map(CompositeItemsEntity::getImageFileName)
+                .map(resourceRestService::getPrizeInfoImageFile)
                 .map(Base64Converter::encodeFileToBase64)
                 .orElse(StringUtils.EMPTY);
     }
 
-    private CompositeItems getCompositeItem(CompositeItemData compositeItemData) {
-        List<CompositeItems> compositeItems = compositeItemsRepository.findAllByType(compositeItemData.getType());
+    private CompositeItemsEntity getCompositeItem(CompositeItemData compositeItemData) {
+        List<CompositeItemsEntity> compositeItems = compositeItemsRepository.findAllByType(compositeItemData.getType());
 
         Random rand = new Random();
         int index = rand.nextInt(compositeItems.size());
@@ -181,12 +176,10 @@ public class RouletteServiceImpl implements RouletteService {
     }
 
     private String getRangePrizeImage(RouletteItem rouletteItem) {
-        String path = uploadPath.concat(PRIZES_INFO_DIRECTORY);
-
         return Optional.ofNullable(rouletteItem)
                 .map(RouletteItem::getRangeItemData)
                 .map(RangeItemData::getPrizeImageFileName)
-                .map(path::concat)
+                .map(resourceRestService::getPrizeInfoImageFile)
                 .map(Base64Converter::encodeFileToBase64)
                 .orElse(StringUtils.EMPTY);
     }
@@ -226,24 +219,19 @@ public class RouletteServiceImpl implements RouletteService {
     }
 
     private String getSinglePrizeImage(RouletteItem rouletteItem) {
-        String path = uploadPath.concat(PRIZES_INFO_DIRECTORY);
-
         return Optional.ofNullable(rouletteItem)
                 .map(RouletteItem::getSingleItemData)
                 .map(SingleItemData::getPrizeImageFileName)
-                .map(path::concat)
+                .map(resourceRestService::getPrizeInfoImageFile)
                 .map(Base64Converter::encodeFileToBase64)
                 .orElse(StringUtils.EMPTY);
     }
 
     private List<String> getRouletteItemsImages(List<RouletteItem> rouletteItems) {
-        String path = uploadPath.concat(ROULETTE_ITEMS_DIRECTORY);
-
         return Optional.ofNullable(rouletteItems)
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(RouletteItem::getImageFileName)
-                .map(path::concat)
+                .map(RouletteItem::getImageFile)
                 .map(Base64Converter::encodeFileToBase64)
                 .collect(Collectors.toList());
     }
@@ -252,7 +240,7 @@ public class RouletteServiceImpl implements RouletteService {
 
         List<RouletteItem> rouletteItems = new ArrayList<>();
 
-        List<Category> categories = categoryRepository.findAll();
+        List<CategoryEntity> categories = categoryRepository.findAll();
 
         Optional.of(categories)
                 .orElse(Collections.emptyList())
@@ -264,8 +252,10 @@ public class RouletteServiceImpl implements RouletteService {
 
     }
 
-    private void addItemsByCategory(Category category, List<RouletteItem> rouletteItems) {
-        List<RouletteItem> rouletteItemsByCategory = rouletteItemRepository.findAllByCategoryId(category.getId());
+    private void addItemsByCategory(CategoryEntity category, List<RouletteItem> rouletteItems) {
+        List<RouletteItemEntity> rouletteItemsByCategoryEntity = rouletteItemRepository.findAllByCategoryId(category.getId());
+        List<RouletteItem> rouletteItemsByCategory = resourceRestService.getRouletteItemsWithImages(rouletteItemsByCategoryEntity);
+
         Collections.shuffle(rouletteItemsByCategory);
 
         long residualCount = getItemCount(category);
@@ -294,14 +284,14 @@ public class RouletteServiceImpl implements RouletteService {
                 .forEach(index -> rouletteItems.add(item));
     }
 
-    private long getItemCount(Category category) {
+    private long getItemCount(CategoryEntity category) {
         long probability = getProbability(category);
         return countElementsInOneSpin / ONE_HUNDRED_PERCENT * probability;
     }
 
-    private long getProbability(Category category) {
+    private long getProbability(CategoryEntity category) {
         return Optional.ofNullable(category)
-                .map(Category::getPercentProbability)
+                .map(CategoryEntity::getPercentProbability)
                 .orElse(ZERO_PROBABILITY);
     }
 
@@ -329,7 +319,7 @@ public class RouletteServiceImpl implements RouletteService {
     private void savePrizeToDb(String type, String value, String userId) {
 
         if (StringUtils.isBlank(value)) {
-            value = null;
+            value = EMPTY_PRIZE_VALUE;
         }
 
         RoulettePrizes roulettePrizes = buildRoulettePrizeEntity(type, value, userId);

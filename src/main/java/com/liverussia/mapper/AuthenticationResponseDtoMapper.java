@@ -30,6 +30,6 @@ public interface AuthenticationResponseDtoMapper {
     default void mappingAfter(@MappingTarget AuthenticationResponseDto authenticationResponseDto) {
         Optional.ofNullable(authenticationResponseDto)
                 .map(AuthenticationResponseDto::getUserInfo)
-                .ifPresent(userInfoDto -> userInfoDto.setServerName("Test Server"));
+                .ifPresent(userInfoDto -> userInfoDto.setServerName("Moscow"));
     }
 }

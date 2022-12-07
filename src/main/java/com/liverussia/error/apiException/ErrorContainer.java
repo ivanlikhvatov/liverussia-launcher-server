@@ -25,6 +25,8 @@ public enum ErrorContainer {
     CAPTCHA_ERROR(219, "Попробуйте заново пройти google captcha", HttpStatus.UNAUTHORIZED),
     NOT_ENOUGH_MONEY(220, "Недостаточно денег", HttpStatus.BAD_REQUEST),
 
+    NETWORK_ERROR(221, "Не удалось загрузить данные. Попробуйте еще раз", HttpStatus.NOT_FOUND),
+
     OTHER(999, "Other Type of Error. See error message", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private static final ErrorContainer[] VALUES = values();

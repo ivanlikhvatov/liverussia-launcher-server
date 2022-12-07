@@ -20,19 +20,23 @@ server:
 #      hibernate:
 #        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
+#local
+#spring:
+#  datasource:
+#    user:
+#      url: jdbc:mariadb://localhost:3306/liverussia_test
+#      username: root
+#      password: 122021
+#      driverClassname: org.mariadb.jdbc.Driver
+#    roulette:
+#      url: jdbc:mariadb://localhost:3306/launcher_roulette
+#      username: root
+#      password: 122021
+#      driverClassname: org.mariadb.jdbc.Driver
 
-spring:
-  datasource:
-    user:
-      url: jdbc:mariadb://localhost:3306/liverussia_test
-      username: root
-      password: 122021
-      driverClassname: org.mariadb.jdbc.Driver
-    roulette:
-      url: jdbc:mariadb://localhost:3306/launcher_roulette
-      username: root
-      password: 122021
-      driverClassname: org.mariadb.jdbc.Driver
+
+#test
+
 
 api:
   prefix: /api/v1
@@ -76,6 +80,9 @@ android:
     spinDurationInMillis: 8000
     spinCost: 50
 
-
-upload:
-  path: /Users/ivanlikhvatov/SAMP/liverussia-launcher-server/uploads/
+resources:
+  host: https://files.liverussia.online
+  rouletteItems:
+    path: /roulette/roulette_items
+  prizesInfo:
+    path: /roulette/prizes_info

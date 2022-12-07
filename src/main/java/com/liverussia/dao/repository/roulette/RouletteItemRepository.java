@@ -1,10 +1,10 @@
 package com.liverussia.dao.repository.roulette;
 
-import com.liverussia.dao.entity.roulette.item.RouletteItem;
+import com.liverussia.dao.entity.roulette.item.RouletteItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface RouletteItemRepository extends JpaRepository<RouletteItem, Long> {
-    List<RouletteItem> findAllByCategoryId(Long id);
+public interface RouletteItemRepository extends JpaRepository<RouletteItemEntity, Long> {
+    List<RouletteItemEntity> findAllByCategoryId(Long id);
 }

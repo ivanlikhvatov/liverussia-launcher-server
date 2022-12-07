@@ -16,6 +16,6 @@ public interface UserInfoDtoMapper {
     //TODO убрать когда добавлю базы под каждый сервер
     @AfterMapping
     default void mapAfter(@MappingTarget UserInfoDto userInfoDto, User user) {
-        userInfoDto.setServerName("Test Server");
+        userInfoDto.setServerName("Moscow");
     }
 }

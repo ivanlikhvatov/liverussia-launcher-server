@@ -1,6 +1,7 @@
 package com.liverussia.security;
 
-import com.liverussia.config.SaltPasswordEncoder;
+import com.liverussia.config.
+        SaltPasswordEncoder;
 import com.liverussia.dao.entity.user.User;
 import com.liverussia.error.apiException.ApiException;
 import com.liverussia.error.apiException.ErrorContainer;
@@ -22,7 +23,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
     private final JwtUserMapper jwtUserMapper;
-    private final SaltPasswordEncoder saltPasswordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
@@ -30,9 +30,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         Optional.ofNullable(user)
                 .orElseThrow(() -> new ApiException(ErrorContainer.USER_NOT_FOUND));
-
-        //TODO затестить это при нагрузке
-        saltPasswordEncoder.setSalt(user.getSalt());
 
         return jwtUserMapper.map(user);
     }

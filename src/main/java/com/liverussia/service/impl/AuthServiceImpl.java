@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
 
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
 
-        authenticateUser(request.getLogin(), request.getPassword());
+        authenticateUser(request.getLogin(), request.getPassword(), jwtUser.getSalt());
 
         String accessToken = jwtProvider.generateAccessToken(jwtUser);
         String refreshToken = jwtProvider.generateRefreshToken(jwtUser);
@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
         }
 
-        authenticateUser(request.getLogin(), request.getPassword());
+        authenticateUser(request.getLogin(), request.getPassword(), jwtUser.getSalt());
 
         String accessToken = jwtProvider.generateAccessToken(jwtUser);
         String refreshToken = jwtProvider.generateRefreshToken(jwtUser);
@@ -130,14 +130,13 @@ public class AuthServiceImpl implements AuthService {
         throw new ApiException(ErrorContainer.AUTHENTICATION_ERROR);
     }
 
-    private void authenticateUser(String login, String password) {
+    private void authenticateUser(String login, String password, String salt) {
         UsernamePasswordAuthenticationToken authenticationToken
-                = new UsernamePasswordAuthenticationToken(login, password);
+                = new UsernamePasswordAuthenticationToken(login, password.concat(salt));
 
         try {
             authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ApiException(ErrorContainer.USER_NOT_FOUND);
         }
     }

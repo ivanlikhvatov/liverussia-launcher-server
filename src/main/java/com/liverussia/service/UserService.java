@@ -11,4 +11,6 @@ public interface UserService {
     JwtUser getJwtUserByLogin(String login);
 
     UserInfoDto getUserInfo(JwtUser jwtUser);
+
+    void saveUser(User user);
 }

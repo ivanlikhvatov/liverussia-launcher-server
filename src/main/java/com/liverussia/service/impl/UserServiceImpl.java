@@ -49,5 +49,8 @@ public class UserServiceImpl implements UserService {
         return userInfoDtoMapper.map(user);
     }
 
-
+    @Override
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 }

@@ -60,7 +60,20 @@ public class SecurityConfig {
                                 .antMatchers(roleAdmin)
                                 .hasAuthority(Role.ADMIN_LEVEL_10.name())
                                 .antMatchers(roleAndroidUser)
-                                .hasAuthority(Role.ANDROID_USER.name())
+                                .hasAnyAuthority(
+                                        Role.ANDROID_USER.name(),
+                                        Role.ADMIN_LEVEL_10.name(),
+                                        Role.ADMIN_LEVEL_9.name(),
+                                        Role.ADMIN_LEVEL_8.name(),
+                                        Role.ADMIN_LEVEL_7.name(),
+                                        Role.ADMIN_LEVEL_6.name(),
+                                        Role.ADMIN_LEVEL_5.name(),
+                                        Role.ADMIN_LEVEL_4.name(),
+                                        Role.ADMIN_LEVEL_3.name(),
+                                        Role.ADMIN_LEVEL_3.name(),
+                                        Role.ADMIN_LEVEL_2.name(),
+                                        Role.ADMIN_LEVEL_1.name()
+                                )
                                 .anyRequest()
                                 .authenticated()
                                 .and()

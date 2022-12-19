@@ -11,20 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SaltPasswordEncoder implements PasswordEncoder {
 
-    private String salt;
-
     @Override
     public String encode(CharSequence rawPassword) {
-        return DigestUtils.sha256Hex(rawPassword + salt);
+        return DigestUtils.sha256Hex(rawPassword.toString());
     }
 
     @SneakyThrows
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        if(salt != null) {
-            return DigestUtils.sha256Hex(rawPassword + salt).equalsIgnoreCase(encodedPassword);
-        } else {
-            return rawPassword.equals(encodedPassword);
-        }
+        return DigestUtils.sha256Hex(rawPassword.toString()).equalsIgnoreCase(encodedPassword);
     }
 }

@@ -18,6 +18,11 @@ public interface JwtUserMapper {
     default void mapAfter(@MappingTarget JwtUser jwtUser, User user) {
         Set<Role> userRoles = Role.getAllRolesByAdminLevel(user.getAdminLevel());
         jwtUser.setRoles(userRoles);
+//
+//        String password = user.getPassword();
+//        String salt = user.getSalt();
+//
+//        jwtUser.setPassword(password.concat(salt));
     }
 
 }

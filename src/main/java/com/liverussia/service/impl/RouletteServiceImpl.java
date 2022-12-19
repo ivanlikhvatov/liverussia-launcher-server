@@ -99,11 +99,9 @@ public class RouletteServiceImpl implements RouletteService {
 
     private void processRouletteSpinPay(User user) {
         Donate donate = donateRepository.findByUserId(user.getId());
-        Integer newBalance = donate.getBalance() - spinCost;
-        donate.setBalance(newBalance);
-        user.setBalance(newBalance.toString());
-
-        donateRepository.save(donate);
+        int newBalance = donate.getBalance() - spinCost;
+        user.setBalance(Integer.toString(newBalance));
+        userService.saveUser(user);
     }
 
     private void handleCompositeType(SpinRouletteResponseDto response, RouletteItem rouletteItem, User user) {

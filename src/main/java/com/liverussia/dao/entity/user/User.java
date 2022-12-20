@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -28,5 +29,5 @@ public class User {
     private Integer adminLevel;
 
     @Column(name = "prubles")
-    private String balance;
+    private BigDecimal balance;
 }

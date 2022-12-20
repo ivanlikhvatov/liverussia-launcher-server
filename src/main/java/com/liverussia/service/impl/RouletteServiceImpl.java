@@ -6,13 +6,11 @@ import com.liverussia.dao.entity.roulette.item.RouletteItemEntity;
 import com.liverussia.dao.entity.roulette.item.RouletteItemType;
 import com.liverussia.dao.entity.roulette.rangeItem.RangeElementType;
 import com.liverussia.dao.entity.roulette.singleItem.SingleElementType;
-import com.liverussia.dao.entity.user.Donate;
 import com.liverussia.dao.entity.user.RoulettePrizes;
 import com.liverussia.dao.entity.user.User;
 import com.liverussia.dao.repository.roulette.CategoryRepository;
 import com.liverussia.dao.repository.roulette.CompositeItemsRepository;
 import com.liverussia.dao.repository.roulette.RouletteItemRepository;
-import com.liverussia.dao.repository.user.DonateRepository;
 import com.liverussia.dao.repository.user.RoulettePrizesRepository;
 import com.liverussia.domain.JwtUser;
 import com.liverussia.domain.roulette.CompositeItemData;
@@ -32,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -41,6 +40,7 @@ import java.util.stream.LongStream;
 public class RouletteServiceImpl implements RouletteService {
 
     private final static long ZERO = 0L;
+    private final static int BIG_DECIMAL_COMPARE_EQUALS_RESULT = 0;
     private final static long ZERO_PROBABILITY = 0L;
     private final static long ONE_HUNDRED_PERCENT = 100;
     private final static int COUNT_ITEM_BEFORE_PRIZE = 2;
@@ -50,12 +50,11 @@ public class RouletteServiceImpl implements RouletteService {
     private final RouletteItemRepository rouletteItemRepository;
     private final CompositeItemsRepository compositeItemsRepository;
     private final CategoryRepository categoryRepository;
-    private final DonateRepository donateRepository;
     private final RoulettePrizesRepository roulettePrizesRepository;
     private final ResourceRestService resourceRestService;
 
     @Value("${android.roulette.spinCost}")
-    private Integer spinCost;
+    private BigDecimal spinCost;
 
     @Value("${android.roulette.countElementsInOneSpin}")
     private Integer countElementsInOneSpin;
@@ -98,9 +97,8 @@ public class RouletteServiceImpl implements RouletteService {
     }
 
     private void processRouletteSpinPay(User user) {
-        Donate donate = donateRepository.findByUserId(user.getId());
-        int newBalance = donate.getBalance() - spinCost;
-        user.setBalance(Integer.toString(newBalance));
+        BigDecimal newBalance = user.getBalance().subtract(spinCost);
+        user.setBalance(newBalance);
         userService.saveUser(user);
     }
 
@@ -294,13 +292,12 @@ public class RouletteServiceImpl implements RouletteService {
     }
 
     private void checkUserBalance(User user) {
-        if (StringUtils.isBlank(user.getBalance())) {
+        if (user.getBalance() == null) {
             throw new ApiException(ErrorContainer.NOT_ENOUGH_MONEY);
         }
 
-        long balance = Long.parseLong(user.getBalance());
 
-        if (balance < spinCost) {
+        if (user.getBalance().compareTo(spinCost) < BIG_DECIMAL_COMPARE_EQUALS_RESULT) {
             throw new ApiException(ErrorContainer.NOT_ENOUGH_MONEY);
         }
     }

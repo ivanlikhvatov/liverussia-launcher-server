@@ -195,9 +195,9 @@ public class RouletteServiceImpl implements RouletteService {
         if (SingleElementType.CAR.equals(type)) {
             String sampId = getSingleItemSampId(rouletteItem);
             savePrizeToDb(SingleElementType.CAR.getSampType(), sampId, user.getId());
+        } else {
+            savePrizeToDb(type.getSampType(), type.getSampValue(), user.getId());
         }
-
-        savePrizeToDb(type.getSampType(), type.getSampValue(), user.getId());
     }
 
     private String getSingleItemSampId(RouletteItem rouletteItem) {

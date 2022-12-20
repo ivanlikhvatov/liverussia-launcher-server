@@ -27,6 +27,11 @@ public class AndroidUserController {
 
     @PostMapping("/roulette/spin")
     public SpinRouletteResponseDto spinRoulette(@AuthenticationPrincipal JwtUser jwtUser) {
+
+        for (int i = 0; i < 1000; i++ ) {
+            rouletteService.spinRoulette(jwtUser);
+        }
+
         return rouletteService.spinRoulette(jwtUser);
     }
 }

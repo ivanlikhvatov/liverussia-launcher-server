@@ -34,11 +34,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponseDto loginAndroidUser(AuthenticationRequestDto request) {
-        boolean isValidCaptcha = captchaRestService.validateCaptcha(request.getCaptchaToken());
-
-        if (!isValidCaptcha) {
-            throw new ApiException(ErrorContainer.CAPTCHA_ERROR);
-        }
+//        boolean isValidCaptcha = captchaRestService.validateCaptcha(request.getCaptchaToken());
+//
+//        if (!isValidCaptcha) {
+//            throw new ApiException(ErrorContainer.CAPTCHA_ERROR);
+//        }
 
         JwtUser jwtUser = userService.getJwtUserByLogin(request.getLogin());
 
